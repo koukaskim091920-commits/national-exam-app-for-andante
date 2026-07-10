@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>看護トリアージクイズ 上級編</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif;background:#f5f5f0;color:#1a1a1a;padding:16px;font-size:15px}
+.wrap{max-width:480px;margin:0 auto}
+.prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.prog-bar{flex:1;height:6px;border-radius:3px;background:#e0e0e0;overflow:hidden}
+.prog-fill{height:100%;background:#8b5cf6;border-radius:3px;transition:width .4s}
+.prog-label{font-size:13px;color:#666;white-space:nowrap}
+.card{background:#fff;border-radius:14px;border:1px solid #e5e5e5;padding:14px 16px;margin-bottom:14px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#ede9fe;color:#6d28d9;margin-bottom:8px}
+.scenario{font-size:13px;line-height:1.7;color:#555}
+.kw-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.kw-tag{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:5px 11px;border-radius:20px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;font-weight:500}
+.kw-num{font-size:11px;opacity:.65;font-weight:700}
+textarea{width:100%;min-height:140px;font-size:15px;line-height:1.7;padding:12px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;color:#1a1a1a;resize:vertical;font-family:inherit}
+textarea:focus{outline:none;border-color:#8b5cf6}
+.btn-row{display:flex;gap:10px;margin-top:4px}
+button{flex:1;font-size:15px;font-weight:600;padding:13px;border-radius:12px;border:1.5px solid #d1d5db;background:#fff;color:#1a1a1a;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:active{background:#f0f0f0}
+#actionBtn{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
+#actionBtn:active{background:#7c3aed}
+.fb{border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.8;display:none}
+.fb-ok{background:#f0fdf4;border:1px solid #86efac}
+.fb-info{background:#fff;border:1px solid #e5e5e5}
+.fb-warn{background:#fffbeb;border:1px solid #fcd34d;color:#92400e}
+.fb-title{font-weight:700;margin-bottom:8px;font-size:14px}
+.found-tag{display:inline-block;margin:2px;padding:3px 9px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px;font-weight:500}
+.miss-tag{display:inline-block;margin:2px;padding:3px 9px;border-radius:20px;background:#f3f4f6;color:#6b7280;font-size:12px;border:1px solid #e5e5e5}
+.tip-item{margin:6px 0;padding-left:12px;border-left:3px solid #c4b5fd;color:#333;font-size:13px;line-height:1.6}
+.model-box{margin:12px 0 0;padding:12px;background:#f5f3ff;border-radius:10px;border:1px solid #ddd6fe}
+.model-label{font-size:11px;color:#7c3aed;font-weight:700;margin-bottom:5px}
+.model-text{color:#333;font-size:13px;line-height:1.7}
+.result-wrap{text-align:center;padding:24px 0}
+.result-score{font-size:48px;font-weight:700;color:#1a1a1a}
+.result-msg{font-size:14px;color:#666;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="prog-wrap">
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <span class="prog-label" id="progLabel">1 / 5</span>
+</div>
+<div class="card">
+  <div class="badge">夜勤帯（基本）上級編</div>
+  <p class="scenario" id="scenario"></p>
+</div>
+<div class="card">
+  <p style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">🔑 必ず使うキーワード（この順番で）</p>
+  <div class="kw-list" id="keywords"></div>
+</div>
+<div style="margin-bottom:14px">
+  <p style="font-size:13px;color:#666;margin-bottom:8px">先生への報告文を自由に書いてください</p>
+  <textarea id="userInput" placeholder="キーワードをすべて使って、自分の言葉で書いてみましょう。文章が多少おかしくてもOKです！"></textarea>
+</div>
+<div class="fb" id="feedback"></div>
+<div class="btn-row">
+  <button id="clearBtn" onclick="clearInput()">↺ リセット</button>
+  <button id="actionBtn" onclick="handleAction()">採点する →</button>
+</div>
+</div>
+
+<script>
+var qs=[
+{scenario:"夜勤帯、モニターの不整脈アラームが鳴っており、別の病室から転倒の疑いもあります。点滴ポンプの閉塞アラームも同時に鳴っています。",
+keywords:["転倒の疑い","不整脈アラーム","点滴閉塞","急変の可能性","応援をお願い"],
+modelAnswer:"「先生、転倒の疑いがある患者様と不整脈アラーム、点滴閉塞が同時に発生しています。急変の可能性があるため、至急応援をお願いします。」",
+tips:["「転倒の疑い」を最初に伝えることで、緊急度が一瞬で伝わります","数字や部屋番号を加えるとさらに具体的になります","S→B→A→RのSBAR構造を意識してみましょう"]},
+{scenario:"日勤帯、患者Aが胸痛と冷や汗を訴えており、患者Bでは経管栄養の逆流が疑われます。",
+keywords:["胸痛と冷や汗","急性冠症候群の可能性","心電図をお願い","経管栄養を中止"],
+modelAnswer:"「先生、○○号室の患者様が胸痛と冷や汗を訴えています。急性冠症候群の可能性があるため、心電図をお願いします。別の患者様で経管栄養の逆流があり、経管栄養を中止しました。」",
+tips:["「胸痛と冷や汗」をセットで伝えることで緊急度が一言で伝わります","すでに取った対応（経管栄養を中止）を含めると医師が安心して指示を出せます","複数患者がいる場合は優先順位を明示するとさらに良いですね"]},
+{scenario:"夜勤帯、透析中の患者様の血圧が低下し、認知症の患者様が転落しそうになっています。",
+keywords:["透析中の血圧低下","ショックの危険","転落リスク","応援をお願い"],
+modelAnswer:"「先生、透析中の患者様の血圧低下があり、ショックの危険があります。同時に認知症の患者様に転落リスクがあります。至急応援をお願いします。」",
+tips:["処置中（透析中）の急変は特に緊急度が高いことが伝わっています","「ショックの危険」という言葉は医師への緊急サインとして非常に効果的です","スタッフの現在の対応状況を加えると医師が安心して判断できます"]},
+{scenario:"夜勤帯、SpO2が88%に低下し、術後患者様の創部から出血がみられます。",
+keywords:["SpO2が88%","低酸素の可能性","酸素投与を準備","創部に鮮血","圧迫止血"],
+modelAnswer:"「先生、○○号室の患者様のSpO2が88%まで低下しています。低酸素の可能性があり、酸素投与を準備しました。また術後の患者様の創部に鮮血がにじんでいるため、圧迫止血を開始しました。至急診察をお願いします。」",
+tips:["SpO2の具体的な数値（88%）を伝えると緊急度が一瞬で伝わります","すでに取った行動（酸素投与を準備・圧迫止血）を含めているのがポイントです","複数の緊急事態を簡潔にまとめる力が夜勤帯報告の核心です"]},
+{scenario:"日勤帯、検査室からカリウムのパニック値の連絡があり、嚥下調整食の患者様に普通食が誤配膳されています。",
+keywords:["カリウムパニック値","致死性不整脈の可能性","心電図をお願い","誤配膳を中止"],
+modelAnswer:"「先生、検査室からカリウムパニック値の連絡が入りました。致死性不整脈の可能性があるため、至急心電図をお願いします。また嚥下調整食の患者様への誤配膳があり、すでに誤配膳を中止しました。」",
+tips:["「パニック値」という言葉を使うことで緊急連絡であることが即座に伝わります","致死性不整脈という具体的なリスクを明示すると医師が優先度を判断しやすくなります","誤配膳への対応（中止）を報告に含めることで二次被害を防いだことが伝わります"]}
+];
+var cur=0,score=0,answered=false;
+function render(){
+  answered=false;
+  var q=qs[cur];
+  document.getElementById("prog").style.width=Math.round(cur/qs.length*100)+"%";
+  document.getElementById("progLabel").textContent=(cur+1)+" / "+qs.length;
+  document.getElementById("scenario").textContent="📍 "+q.scenario;
+  var kw=document.getElementById("keywords");
+  kw.innerHTML="";
+  q.keywords.forEach(function(k,i){
+    var sp=document.createElement("span");
+    sp.className="kw-tag";
+    sp.innerHTML='<span class="kw-num">'+(i+1)+'.</span>'+k;
+    kw.appendChild(sp);
+  });
+  document.getElementById("userInput").value="";
+  document.getElementById("userInput").disabled=false;
+  var fb=document.getElementById("feedback");
+  fb.style.display="none";fb.className="fb";
+  var ab=document.getElementById("actionBtn");
+  ab.textContent="採点する →";ab.onclick=handleAction;ab.disabled=false;
+  document.getElementById("clearBtn").style.display="";
+}
+function clearInput(){if(answered)return;document.getElementById("userInput").value="";}
+function handleAction(){if(answered){next();}else{evaluate();}}
+function checkOrder(text,kws){
+  var pos=0,found=[];
+  kws.forEach(function(k){var i=text.indexOf(k,pos);if(i>=0){found.push(k);pos=i+k.length;}});
+  return found;
+}
+function evaluate(){
+  var text=document.getElementById("userInput").value.trim();
+  if(!text||text.length<5){warn("報告文を入力してください。");return;}
+  var q=qs[cur];
+  var found=checkOrder(text,q.keywords);
+  var isCorrect=found.length===q.keywords.length;
+  if(isCorrect)score++;
+  answered=true;
+  document.getElementById("userInput").disabled=true;
+  var fb=document.getElementById("feedback");
+  fb.style.display="block";
+  var foundHtml=found.map(function(k){return'<span class="found-tag">✓ '+k+'</span>';}).join(" ");
+  var missed=q.keywords.filter(function(k){return found.indexOf(k)<0;});
+  var missedHtml=missed.map(function(k){return'<span class="miss-tag">'+k+'</span>';}).join(" ");
+  var tipsHtml=q.tips.map(function(t){return'<div class="tip-item">'+t+'</div>';}).join("");
+  var modelHtml='<div class="model-box"><div class="model-label">参考：模範解答</div><div class="model-text">'+q.modelAnswer+'</div></div>';
+  var praise=found.length===0?"キーワードを意識して書こうとした姿勢が大切です！":
+             found.length<=2?"「"+found.join("」「")+"」がしっかり入っています！":
+             "「"+found.join("」「")+"」が正しい順番で入っています！";
+  if(isCorrect){
+    fb.className="fb fb-ok";
+    fb.innerHTML='<div class="fb-title" style="color:#166534">⭐ 素晴らしい！全キーワードが正しい順番で入っています</div>'
+      +'<div style="margin-bottom:12px">'+foundHtml+'</div>'
+      +'<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">さらに良くなるヒント</div>'
+      +tipsHtml+modelHtml;
+  }else{
+    fb.className="fb fb-info";
+    fb.innerHTML='<div class="fb-title" style="color:#6d28d9">👍 '+praise+'</div>'
+      +(found.length>0?'<div style="margin-bottom:10px">'+foundHtml+'</div>':"")
+      +(missed.length>0?'<div style="font-size:12px;color:#888;margin-bottom:4px">次回加えるとさらに完璧：</div><div style="margin-bottom:12px">'+missedHtml+'</div>':"")
+      +'<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">より良くなるヒント</div>'
+      +tipsHtml+modelHtml;
+  }
+  document.getElementById("clearBtn").style.display="none";
+  var ab=document.getElementById("actionBtn");
+  if(cur<qs.length-1){ab.textContent="次の問題へ →";ab.onclick=next;}
+  else{ab.textContent="結果を見る →";ab.onclick=showResult;}
+}
+function warn(msg){var fb=document.getElementById("feedback");fb.className="fb fb-warn";fb.style.display="block";fb.innerHTML='<div class="fb-title">⚠ '+msg+'</div>';}
+function next(){cur++;render();}
+function showResult(){
+  document.getElementById("prog").style.width="100%";
+  document.getElementById("progLabel").textContent="完了！";
+  var msgs=["もう一度キーワードを確認してチャレンジしましょう！","解説を読み直すと、さらに上達しますよ！","あと少しで完璧！素晴らしい報告力です！","ほぼ完璧！SBARマスターに近づいています！","完璧です！報告文マスターですね！"];
+  var msg=msgs[Math.min(score,4)];
+  document.querySelector(".card").innerHTML='<div class="result-wrap"><div class="result-score">'+score+' / '+qs.length+'</div><div class="result-msg">'+msg+'</div></div>';
+  document.getElementById("keywords").innerHTML="";
+  document.getElementById("userInput").style.display="none";
+  document.getElementById("feedback").style.display="none";
+  document.getElementById("clearBtn").style.display="none";
+  var ab=document.getElementById("actionBtn");
+  ab.textContent="もう一度挑戦する →";
+  ab.onclick=function(){cur=0;score=0;location.reload();};
+}
+render();
+</script>
+</body>
+</html>
