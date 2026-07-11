@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>看護トリアージクイズ 上級編 Ver.2.0</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',
+  'Hiragino Sans','Noto Sans JP',sans-serif;
+  background:#f5f5f0;
+  color:#1a1a1a;
+  padding:16px;
+  font-size:15px;
+}
+
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+}
+
+.prog-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.prog-bar{
+  flex:1;
+  height:6px;
+  border-radius:3px;
+  background:#e0e0e0;
+  overflow:hidden;
+}
+
+.prog-fill{
+  height:100%;
+  background:#8b5cf6;
+  border-radius:3px;
+  transition:width .4s;
+}
+
+.prog-label{
+  font-size:13px;
+  color:#666;
+  white-space:nowrap;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  border:1px solid #e5e5e5;
+  padding:14px 16px;
+  margin-bottom:14px;
+}
+
+.badge{
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:20px;
+  background:#ede9fe;
+  color:#6d28d9;
+  margin-bottom:8px;
+}
+
+.scenario{
+  font-size:13px;
+  line-height:1.7;
+  color:#555;
+}
+
+.kw-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:4px;
+}
+
+.kw-tag{
+  display:inline-flex;
+  align-items:center;
+  font-size:13px;
+  padding:5px 11px;
+  border-radius:20px;
+  background:#ede9fe;
+  color:#6d28d9;
+  border:1px solid #c4b5fd;
+  font-weight:500;
+}
+
+textarea{
+  width:100%;
+  min-height:140px;
+  font-size:15px;
+  line-height:1.7;
+  padding:12px;
+  border-radius:12px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  resize:vertical;
+  font-family:inherit;
+}
+
+textarea:focus{
+  outline:none;
+  border-color:#8b5cf6;
+}
+
+textarea:disabled{
+  opacity:1;
+  background:#f9f9f9;
+  color:#444;
+  -webkit-text-fill-color:#444;
+}
+
+.btn-row{
+  display:flex;
+  gap:10px;
+  margin-top:4px;
+}
+
+button{
+  flex:1;
+  font-size:15px;
+  font-weight:600;
+  padding:13px;
+  border-radius:12px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:active{
+  background:#f0f0f0;
+}
+
+#actionBtn{
+  background:#8b5cf6;
+  color:#fff;
+  border-color:#8b5cf6;
+}
+
+#actionBtn:active{
+  background:#7c3aed;
+}
+
+.fb{
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  font-size:13px;
+  line-height:1.8;
+  display:none;
+}
+
+.fb-ok{
+  background:#f0fdf4;
+  border:1px solid #86efac;
+}
+
+.fb-info{
+  background:#fff;
+  border:1px solid #e5e5e5;
+}
+
+.fb-warn{
+  background:#fffbeb;
+  border:1px solid #fcd34d;
+  color:#92400e;
+}
+
+.fb-title{
+  font-weight:700;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.found-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:12px;
+  font-weight:500;
+}
+
+.order-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#fef3c7;
+  color:#92400e;
+  font-size:12px;
+  border:1px solid #fcd34d;
+}
+
+.miss-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#f3f4f6;
+  color:#6b7280;
+  font-size:12px;
+  border:1px solid #e5e5e5;
+}
+
+.tip-item{
+  margin:6px 0;
+  padding-left:12px;
+  border-left:3px solid #c4b5fd;
+  color:#333;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.model-box{
+  margin:12px 0 0;
+  padding:12px;
+  background:#f5f3ff;
+  border-radius:10px;
+  border:1px solid #ddd6fe;
+}
+
+.model-label{
+  font-size:11px;
+  color:#7c3aed;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.model-text{
+  color:#333;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.result-wrap{
+  text-align:center;
+  padding:24px 0;
+}
+
+.result-score{
+  font-size:48px;
+  font-weight:700;
+  color:#1a1a1a;
+}
+
+.result-msg{
+  font-size:14px;
+  color:#666;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="prog-wrap">
+    <div class="prog-bar">
+      <div class="prog-fill" id="prog" style="width:0%"></div>
+    </div>
+    <span class="prog-label" id="progLabel">1 / 5</span>
+  </div>
+
+  <div class="card" id="scenarioCard">
+    <div class="badge">夜勤帯（基本）上級編 Ver.2.0</div>
+    <p class="scenario" id="scenario"></p>
+  </div>
+
+  <div class="card" id="keywordCard">
+    <p style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">
+      🔑 必ず使うキーワード
+    </p>
+
+    <p style="font-size:12px;color:#888;margin-bottom:10px">
+      表示順ではなく、報告として適切な順番を考えて文章にしてください。
+    </p>
+
+    <div class="kw-list" id="keywords"></div>
+  </div>
+
+  <div id="inputArea" style="margin-bottom:14px">
+    <p style="font-size:13px;color:#666;margin-bottom:8px">
+      先生への報告文を自由に書いてください
+    </p>
+
+    <textarea
+      id="userInput"
+      placeholder="キーワードをすべて使い、報告の順番を考えて、自分の言葉で書いてみましょう。">
+    </textarea>
+  </div>
+
+  <div class="fb" id="feedback"></div>
+
+  <div class="btn-row">
+    <button id="clearBtn" onclick="clearInput()">↺ リセット</button>
+    <button id="actionBtn" onclick="handleAction()">採点する →</button>
+  </div>
+
+</div>
+
+<script>
+var qs=[
+{
+  scenario:"夜勤帯、モニターの不整脈アラームが鳴っており、別の病室から転倒の疑いもあります。点滴ポンプの閉塞アラームも同時に鳴っています。",
+  keywords:[
+    "転倒の疑い",
+    "不整脈アラーム",
+    "点滴閉塞",
+    "急変の可能性",
+    "応援をお願い"
+  ],
+  modelAnswer:"「先生、転倒の疑いがある患者様と不整脈アラーム、点滴閉塞が同時に発生しています。急変の可能性があるため、至急応援をお願いします。」",
+  tips:[
+    "「転倒の疑い」を最初に伝えることで、緊急度が一瞬で伝わります",
+    "数字や部屋番号を加えると、さらに具体的になります",
+    "状況・背景・評価・依頼の流れを意識してみましょう"
+  ]
+},
+{
+  scenario:"日勤帯、患者Aが胸痛と冷や汗を訴えており、患者Bでは経管栄養の逆流が疑われます。",
+  keywords:[
+    "胸痛と冷や汗",
+    "急性冠症候群の可能性",
+    "心電図をお願い",
+    "経管栄養を中止"
+  ],
+  modelAnswer:"「先生、○○号室の患者様が胸痛と冷や汗を訴えています。急性冠症候群の可能性があるため、心電図をお願いします。別の患者様で経管栄養の逆流があり、経管栄養を中止しました。」",
+  tips:[
+    "「胸痛と冷や汗」をセットで伝えることで緊急度が伝わります",
+    "すでに取った対応を含めると、医師が次の指示を出しやすくなります",
+    "複数患者がいる場合は、優先順位を明確にするとさらに良くなります"
+  ]
+},
+{
+  scenario:"夜勤帯、透析中の患者様の血圧が低下し、認知症の患者様が転落しそうになっています。",
+  keywords:[
+    "透析中の血圧低下",
+    "ショックの危険",
+    "転落リスク",
+    "応援をお願い"
+  ],
+  modelAnswer:"「先生、透析中の患者様の血圧低下があり、ショックの危険があります。同時に認知症の患者様に転落リスクがあります。至急応援をお願いします。」",
+  tips:[
+    "処置中の急変は、特に緊急度が高いことを意識しましょう",
+    "「ショックの危険」は医師への重要な緊急サインです",
+    "スタッフの現在の対応状況も加えると、状況がさらに伝わります"
+  ]
+},
+{
+  scenario:"夜勤帯、SpO2が88%に低下し、術後患者様の創部から出血がみられます。",
+  keywords:[
+    "SpO2が88%",
+    "低酸素の可能性",
+    "酸素投与を準備",
+    "創部に鮮血",
+    "圧迫止血"
+  ],
+  modelAnswer:"「先生、○○号室の患者様のSpO2が88%まで低下しています。低酸素の可能性があり、酸素投与を準備しました。また術後の患者様の創部に鮮血がにじんでいるため、圧迫止血を開始しました。至急診察をお願いします。」",
+  tips:[
+    "SpO2の具体的な数値を伝えると、緊急度が伝わります",
+    "すでに取った行動を含めることが重要です",
+    "複数の緊急事態を簡潔にまとめる力を意識しましょう"
+  ]
+},
+{
+  scenario:"日勤帯、検査室からカリウムのパニック値の連絡があり、嚥下調整食の患者様に普通食が誤配膳されています。",
+  keywords:[
+    "カリウムパニック値",
+    "致死性不整脈の可能性",
+    "心電図をお願い",
+    "誤配膳を中止"
+  ],
+  modelAnswer:"「先生、検査室からカリウムパニック値の連絡が入りました。致死性不整脈の可能性があるため、至急心電図をお願いします。また嚥下調整食の患者様への誤配膳があり、すでに誤配膳を中止しました。」",
+  tips:[
+    "「パニック値」と伝えることで緊急連絡であることが伝わります",
+    "具体的なリスクを明示すると、医師が優先度を判断しやすくなります",
+    "誤配膳への対応も報告に含めましょう"
+  ]
+}
+];
+
+/* 配列をランダムに並べ替える */
+function shuffleArray(array){
+  var copied=array.slice();
+
+  for(var i=copied.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=copied[i];
+    copied[i]=copied[j];
+    copied[j]=temp;
+  }
+
+  return copied;
+}
+
+/* 問題順をランダム化 */
+qs=shuffleArray(qs);
+
+var cur=0;
+var score=0;
+var answered=false;
+
+function render(){
+  answered=false;
+
+  var q=qs[cur];
+
+  document.getElementById("prog").style.width=
+    Math.round(cur/qs.length*100)+"%";
+
+  document.getElementById("progLabel").textContent=
+    (cur+1)+" / "+qs.length;
+
+  document.getElementById("scenario").textContent=
+    "📍 "+q.scenario;
+
+  var keywordArea=document.getElementById("keywords");
+  keywordArea.innerHTML="";
+
+  /* 表示用キーワードだけランダム化する */
+  var displayedKeywords=shuffleArray(q.keywords);
+
+  displayedKeywords.forEach(function(keyword){
+    var span=document.createElement("span");
+    span.className="kw-tag";
+    span.textContent=keyword;
+    keywordArea.appendChild(span);
+  });
+
+  var input=document.getElementById("userInput");
+  input.value="";
+  input.disabled=false;
+  input.style.display="";
+
+  document.getElementById("inputArea").style.display="";
+  document.getElementById("keywordCard").style.display="";
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
+
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="採点する →";
+  actionButton.onclick=handleAction;
+  actionButton.disabled=false;
+
+  document.getElementById("clearBtn").style.display="";
+}
+
+function clearInput(){
+  if(answered)return;
+
+  document.getElementById("userInput").value="";
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
+}
+
+function handleAction(){
+  if(answered){
+    next();
+  }else{
+    evaluate();
+  }
+}
+
+/* 本文中にキーワードが存在するか確認 */
+function getUsedKeywords(text,keywords){
+  return keywords.filter(function(keyword){
+    return text.indexOf(keyword)>=0;
+  });
+}
+
+/* 正しい順番で使われているキーワードを確認 */
+function getCorrectOrderKeywords(text,keywords){
+  var lastPosition=-1;
+  var correctOrder=[];
+
+  keywords.forEach(function(keyword){
+    var position=text.indexOf(keyword);
+
+    if(position>=0 && position>lastPosition){
+      correctOrder.push(keyword);
+      lastPosition=position;
+    }
+  });
+
+  return correctOrder;
+}
+
+function evaluate(){
+  var text=document.getElementById("userInput").value.trim();
+
+  if(!text || text.length<5){
+    warn("報告文を入力してください。");
+    return;
+  }
+
+  var q=qs[cur];
+
+  var usedKeywords=getUsedKeywords(text,q.keywords);
+  var correctOrderKeywords=getCorrectOrderKeywords(text,q.keywords);
+
+  var missingKeywords=q.keywords.filter(function(keyword){
+    return usedKeywords.indexOf(keyword)<0;
+  });
+
+  var wrongOrderKeywords=usedKeywords.filter(function(keyword){
+    return correctOrderKeywords.indexOf(keyword)<0;
+  });
+
+  var allUsed=usedKeywords.length===q.keywords.length;
+  var correctOrder=correctOrderKeywords.length===q.keywords.length;
+  var isCorrect=allUsed && correctOrder;
+
+  if(isCorrect){
+    score++;
+  }
+
+  answered=true;
+
+  document.getElementById("userInput").disabled=true;
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="block";
+
+  var correctHtml=correctOrderKeywords.map(function(keyword){
+    return '<span class="found-tag">✓ '+keyword+'</span>';
+  }).join(" ");
+
+  var wrongOrderHtml=wrongOrderKeywords.map(function(keyword){
+    return '<span class="order-tag">↔ '+keyword+'</span>';
+  }).join(" ");
+
+  var missingHtml=missingKeywords.map(function(keyword){
+    return '<span class="miss-tag">'+keyword+'</span>';
+  }).join(" ");
+
+  var tipsHtml=q.tips.map(function(tip){
+    return '<div class="tip-item">'+tip+'</div>';
+  }).join("");
+
+  var modelHtml=
+    '<div class="model-box">'+
+      '<div class="model-label">参考：模範解答</div>'+
+      '<div class="model-text">'+q.modelAnswer+'</div>'+
+    '</div>';
+
+  if(isCorrect){
+    feedback.className="fb fb-ok";
+
+    feedback.innerHTML=
+      '<div class="fb-title" style="color:#166534">'+
+        '⭐ 素晴らしい！すべてのキーワードを適切な順番で使えています'+
+      '</div>'+
+      '<div style="margin-bottom:12px">'+correctHtml+'</div>'+
+      '<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">'+
+        'さらに良くなるヒント'+
+      '</div>'+
+      tipsHtml+
+      modelHtml;
+
+  }else{
+    feedback.className="fb fb-info";
+
+    var summary="";
+
+    if(correctOrderKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#888;margin-bottom:4px">'+
+          '適切な順番で使えたキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:10px">'+correctHtml+'</div>';
+    }
+
+    if(wrongOrderKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#92400e;margin-bottom:4px">'+
+          '使われていますが、報告の順番を見直したいキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:10px">'+wrongOrderHtml+'</div>';
+    }
+
+    if(missingKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#888;margin-bottom:4px">'+
+          'まだ使われていないキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:12px">'+missingHtml+'</div>';
+    }
+
+    feedback.innerHTML=
+      '<div class="fb-title" style="color:#6d28d9">'+
+        '👍 キーワードと報告順を確認してみましょう'+
+      '</div>'+
+      summary+
+      '<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">'+
+        'より良くなるヒント'+
+      '</div>'+
+      tipsHtml+
+      modelHtml;
+  }
+
+  document.getElementById("clearBtn").style.display="none";
+
+  var actionButton=document.getElementById("actionBtn");
+
+  if(cur<qs.length-1){
+    actionButton.textContent="次の問題へ →";
+    actionButton.onclick=next;
+  }else{
+    actionButton.textContent="結果を見る →";
+    actionButton.onclick=showResult;
+  }
+}
+
+function warn(message){
+  var feedback=document.getElementById("feedback");
+
+  feedback.className="fb fb-warn";
+  feedback.style.display="block";
+
+  feedback.innerHTML=
+    '<div class="fb-title">⚠ '+message+'</div>';
+}
+
+function next(){
+  cur++;
+  render();
+}
+
+function showResult(){
+  document.getElementById("prog").style.width="100%";
+  document.getElementById("progLabel").textContent="完了！";
+
+  var messages=[
+    "もう一度キーワードと報告順を確認してみましょう！",
+    "解説を読み直すと、さらに上達しますよ！",
+    "あと少しで完璧！報告の流れを意識してみましょう！",
+    "ほぼ完璧！報告文マスターに近づいています！",
+    "完璧です！報告文マスターですね！"
+  ];
+
+  var message=messages[Math.min(score,4)];
+
+  document.getElementById("scenarioCard").innerHTML=
+    '<div class="result-wrap">'+
+      '<div class="result-score">'+score+' / '+qs.length+'</div>'+
+      '<div class="result-msg">'+message+'</div>'+
+    '</div>';
+
+  document.getElementById("keywordCard").style.display="none";
+  document.getElementById("inputArea").style.display="none";
+  document.getElementById("feedback").style.display="none";
+  document.getElementById("clearBtn").style.display="none";
+
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="もう一度挑戦する →";
+
+  actionButton.onclick=function(){
+    location.reload();
+  };
+}
+
+render();
+</script>
+
+</body>
+</html>
