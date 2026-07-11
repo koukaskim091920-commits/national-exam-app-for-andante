@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>看護トリアージクイズ 初級編</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',
+  'Hiragino Sans','Noto Sans JP',sans-serif;
+  background:#f5f5f0;
+  color:#1a1a1a;
+  padding:16px;
+  font-size:15px;
+}
+
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+}
+
+.prog-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.prog-bar{
+  flex:1;
+  height:6px;
+  border-radius:3px;
+  background:#e0e0e0;
+  overflow:hidden;
+}
+
+.prog-fill{
+  height:100%;
+  background:#3b82f6;
+  border-radius:3px;
+  transition:width .4s;
+}
+
+.prog-label{
+  font-size:13px;
+  color:#666;
+  white-space:nowrap;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  border:1px solid #e5e5e5;
+  padding:14px 16px;
+  margin-bottom:14px;
+}
+
+.badge{
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:20px;
+  background:#dbeafe;
+  color:#1d4ed8;
+  margin-bottom:8px;
+}
+
+.scenario{
+  font-size:14px;
+  line-height:1.7;
+  color:#333;
+}
+
+.ev-item{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  padding:10px 12px;
+  background:#f9f9f9;
+  border-radius:10px;
+  border:1px solid #e5e5e5;
+  margin-bottom:8px;
+}
+
+.ev-key{
+  flex-shrink:0;
+  font-weight:700;
+  color:#3b82f6;
+  font-size:14px;
+  min-width:24px;
+}
+
+.ev-text{
+  font-size:14px;
+  line-height:1.6;
+  color:#1a1a1a;
+}
+
+.rank-section{
+  margin-bottom:12px;
+}
+
+.rank-label{
+  font-size:14px;
+  font-weight:600;
+  color:#1a1a1a;
+  margin-bottom:6px;
+}
+
+select{
+  width:100%;
+  font-size:14px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  transition:border-color .2s, background-color .2s;
+  -webkit-appearance:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+}
+
+/* 重複した回答 */
+select.duplicate{
+  border-color:#ef4444;
+  background-color:#fef2f2;
+  color:#991b1b;
+}
+
+/* 答え合わせ後 */
+select.ok{
+  border-color:#22c55e;
+  background-color:#f0fdf4;
+  color:#166534;
+}
+
+select.ng{
+  border-color:#ef4444;
+  background-color:#fef2f2;
+  color:#991b1b;
+}
+
+select:disabled{
+  opacity:1;
+  -webkit-text-fill-color:currentColor;
+}
+
+.btn-row{
+  display:flex;
+  gap:10px;
+  margin-top:4px;
+}
+
+button{
+  flex:1;
+  font-size:15px;
+  font-weight:600;
+  padding:13px;
+  border-radius:12px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:active{
+  background:#f0f0f0;
+}
+
+#actionBtn{
+  background:#3b82f6;
+  color:#fff;
+  border-color:#3b82f6;
+}
+
+#actionBtn:active{
+  background:#2563eb;
+}
+
+.fb{
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  font-size:13px;
+  line-height:1.8;
+  display:none;
+}
+
+.fb-ok{
+  background:#f0fdf4;
+  border:1px solid #86efac;
+  color:#166534;
+}
+
+.fb-ng{
+  background:#fef2f2;
+  border:1px solid #fca5a5;
+  color:#991b1b;
+}
+
+.fb-warn{
+  background:#fffbeb;
+  border:1px solid #fcd34d;
+  color:#92400e;
+}
+
+.fb-title{
+  font-weight:700;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.fb-body{
+  color:#333;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.correct-list div{
+  margin:4px 0;
+  color:#333;
+}
+
+.result-wrap{
+  text-align:center;
+  padding:24px 0;
+}
+
+.result-score{
+  font-size:48px;
+  font-weight:700;
+  color:#1a1a1a;
+}
+
+.result-msg{
+  font-size:14px;
+  color:#666;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="prog-wrap">
+    <div class="prog-bar">
+      <div class="prog-fill" id="prog" style="width:0%"></div>
+    </div>
+    <span class="prog-label" id="progLabel">1 / 5</span>
+  </div>
+
+  <div class="card" id="scenarioCard">
+    <div class="badge">夜勤帯（基本）初級編</div>
+    <p class="scenario" id="scenario"></p>
+  </div>
+
+  <div id="eventsList"></div>
+
+  <div class="card" id="answerCard">
+    <p style="font-size:13px;color:#666;margin-bottom:12px">
+      優先順位を選んでください
+    </p>
+    <div id="dropdowns"></div>
+  </div>
+
+  <div class="fb" id="feedback"></div>
+
+  <div class="btn-row">
+    <button id="clearBtn" onclick="clearAll()">↺ リセット</button>
+    <button id="actionBtn" onclick="handleAction()">答え合わせ →</button>
+  </div>
+
+</div>
+
+<script>
+var qs=[
+{
+  scenario:"夜勤帯、以下の4つが同時に発生しました。",
+  events:[
+    {key:"A",text:"モニターの不整脈アラームが鳴っている"},
+    {key:"B",text:"別の病室から「ドスン」という音がして、患者様が転倒した可能性がある"},
+    {key:"C",text:"別の患者様がナースステーションに来て「聞きたいことがある」と話している"},
+    {key:"D",text:"点滴ポンプの閉塞アラームが鳴っている"}
+  ],
+  correct:["B","A","D","C"],
+  explanation:"【1番目：転倒の疑い】すでに身体的リスクが発生している可能性があり最優先です。【2番目：不整脈アラーム】致死性不整脈の可能性があるため次に確認します。【3番目：点滴アラーム】薬液が止まると治療に影響しますが数分の猶予があります。【4番目：ナースステーション来訪】自力で歩いてこられており安定していると判断できます。"
+},
+{
+  scenario:"日勤帯、以下の4つが重なりました。",
+  events:[
+    {key:"A",text:"患者Aが「胸が痛い、冷や汗が出る」とナースコールを鳴らした"},
+    {key:"B",text:"患者Bの経管栄養が逆流している様子がある"},
+    {key:"C",text:"退院予定の患者Cのご家族が迎えに来て説明を待っている"},
+    {key:"D",text:"患者Dの血糖測定の時間になった"}
+  ],
+  correct:["A","B","D","C"],
+  explanation:"【1番目：胸痛・冷汗】急性冠症候群を疑う最重要サインです。【2番目：経管栄養逆流】誤嚥・窒息のリスクがあり早急な対応が必要です。【3番目：血糖測定】定時業務ですが遅延を最小限にします。【4番目：ご家族対応】一声かけて待っていただけます。"
+},
+{
+  scenario:"夜勤帯、以下の4つが発生しました。",
+  events:[
+    {key:"A",text:"透析中の患者様のモニターで血圧低下アラームが鳴っている"},
+    {key:"B",text:"認知症の患者様が「家に帰る」と言ってベッドを降りようとしている"},
+    {key:"C",text:"新規入院患者様がまもなく到着するとの連絡が入った"},
+    {key:"D",text:"別の患者様のご家族から状態確認の電話がかかってきた"}
+  ],
+  correct:["A","B","C","D"],
+  explanation:"【1番目：透析中の血圧低下】処置中の急変は最優先です。【2番目：転落リスク】今まさに転倒しそうな危険な状態です。【3番目：新規入院】到着前に準備が必要です。【4番目：電話対応】折り返し対応が可能です。"
+},
+{
+  scenario:"夜勤帯、複数の出来事が重なりました。",
+  events:[
+    {key:"A",text:"SpO2モニターのアラームが鳴り88%を示している"},
+    {key:"B",text:"術後患者様の創部ガーゼに鮮血がにじんでいると別スタッフから報告があった"},
+    {key:"C",text:"患者様から「眠れないので話し相手になってほしい」とナースコールがあった"},
+    {key:"D",text:"点滴の滴下速度がいつもより速いことに気づいた"}
+  ],
+  correct:["A","B","D","C"],
+  explanation:"【1番目：SpO2低下】88%は低酸素の重要なサインです。【2番目：創部出血】出血が進んでいる可能性があります。【3番目：滴下速度】過剰投与のリスクがあります。【4番目：話し相手】緊急性は最も低いです。"
+},
+{
+  scenario:"日勤帯、同時に複数のことが起きました。",
+  events:[
+    {key:"A",text:"嚥下調整食のはずの患者様に普通食が誤配膳されているのに気づいた"},
+    {key:"B",text:"患者様が「足のふくらはぎが片方だけ腫れて痛い」と訴えた"},
+    {key:"C",text:"退院指導の時間になった患者様が待っている"},
+    {key:"D",text:"検査室から「採血結果のカリウム値がパニック値です」と電話が入った"}
+  ],
+  correct:["D","A","B","C"],
+  explanation:"【1番目：カリウムパニック値】致死性不整脈につながる最緊急の電解質異常です。【2番目：誤配膳】嚥下障害患者への誤配膳は誤嚥・窒息の危険があります。【3番目：ふくらはぎの腫れ】深部静脈血栓症が疑われます。【4番目：退院指導】生命的な緊急性は最も低いです。"
+}
+];
+
+/* Fisher–Yates方式で配列をランダムに並べ替える */
+function shuffleArray(array){
+  var copied=array.slice();
+
+  for(var i=copied.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=copied[i];
+    copied[i]=copied[j];
+    copied[j]=temp;
+  }
+
+  return copied;
+}
+
+/* 問題順をランダム化 */
+qs=shuffleArray(qs);
+
+var cur=0;
+var score=0;
+var answered=false;
+
+function render(){
+  answered=false;
+
+  var q=qs[cur];
+
+  document.getElementById("prog").style.width=
+    Math.round(cur/qs.length*100)+"%";
+
+  document.getElementById("progLabel").textContent=
+    (cur+1)+" / "+qs.length;
+
+  document.getElementById("scenario").textContent=q.scenario;
+
+  var el=document.getElementById("eventsList");
+  el.innerHTML="";
+
+  q.events.forEach(function(ev){
+    var d=document.createElement("div");
+    d.className="ev-item";
+
+    d.innerHTML=
+      '<span class="ev-key">'+ev.key+'）</span>'+
+      '<span class="ev-text">'+ev.text+'</span>';
+
+    el.appendChild(d);
+  });
+
+  var dd=document.getElementById("dropdowns");
+  dd.innerHTML="";
+
+  ["1番目","2番目","3番目","4番目"].forEach(function(label,i){
+    var wrap=document.createElement("div");
+    wrap.className="rank-section";
+
+    var lbl=document.createElement("div");
+    lbl.className="rank-label";
+    lbl.textContent=label;
+
+    var sel=document.createElement("select");
+    sel.id="sel"+i;
+
+    sel.addEventListener("change",function(){
+      clearDuplicateDisplay();
+    });
+
+    var def=document.createElement("option");
+    def.value="";
+    def.textContent="選択してください";
+    sel.appendChild(def);
+
+    /* 各プルダウンの選択肢をランダム化 */
+    var shuffledEvents=shuffleArray(q.events);
+
+    shuffledEvents.forEach(function(ev){
+      var op=document.createElement("option");
+      op.value=ev.key;
+      op.textContent=ev.text;
+      sel.appendChild(op);
+    });
+
+    wrap.appendChild(lbl);
+    wrap.appendChild(sel);
+    dd.appendChild(wrap);
+  });
+
+  var fb=document.getElementById("feedback");
+  fb.style.display="none";
+  fb.innerHTML="";
+  fb.className="fb";
+
+  var ab=document.getElementById("actionBtn");
+  ab.textContent="答え合わせ →";
+  ab.onclick=handleAction;
+
+  document.getElementById("clearBtn").style.display="";
+}
+
+function clearDuplicateDisplay(){
+  if(answered)return;
+
+  for(var i=0;i<4;i++){
+    var select=document.getElementById("sel"+i);
+
+    if(select){
+      select.classList.remove("duplicate");
+    }
+  }
+
+  var fb=document.getElementById("feedback");
+
+  if(fb.classList.contains("fb-warn")){
+    fb.style.display="none";
+    fb.innerHTML="";
+    fb.className="fb";
+  }
+}
+
+function clearAll(){
+  if(answered)return;
+
+  for(var i=0;i<4;i++){
+    var select=document.getElementById("sel"+i);
+
+    if(select){
+      select.value="";
+      select.className="";
+    }
+  }
+
+  var fb=document.getElementById("feedback");
+  fb.style.display="none";
+  fb.innerHTML="";
+  fb.className="fb";
+}
+
+function handleAction(){
+  if(answered){
+    next();
+  }else{
+    check();
+  }
+}
+
+function check(){
+  var q=qs[cur];
+  var vals=[];
+
+  clearDuplicateDisplay();
+
+  for(var i=0;i<4;i++){
+    var select=document.getElementById("sel"+i);
+
+    if(!select||!select.value){
+      warn("4つすべて選択してください。");
+      return;
+    }
+
+    vals.push(select.value);
+  }
+
+  var duplicateGroups=findDuplicateGroups(vals);
+
+  if(duplicateGroups.length>0){
+    showDuplicateWarning(duplicateGroups);
+    return;
+  }
+
+  answered=true;
+
+  var ok=JSON.stringify(vals)===JSON.stringify(q.correct);
+
+  if(ok){
+    score++;
+  }
+
+  for(var j=0;j<4;j++){
+    var currentSelect=document.getElementById("sel"+j);
+    currentSelect.disabled=true;
+
+    if(vals[j]===q.correct[j]){
+      currentSelect.className="ok";
+    }else{
+      currentSelect.className="ng";
+    }
+  }
+
+  var fb=document.getElementById("feedback");
+  fb.style.display="block";
+
+  var correctText=q.correct.map(function(key,index){
+    var event=q.events.find(function(item){
+      return item.key===key;
+    });
+
+    return "<div>"+(index+1)+"番目："+event.text+"</div>";
+  }).join("");
+
+  if(ok){
+    fb.className="fb fb-ok";
+
+    fb.innerHTML=
+      '<div class="fb-title">✓ 正解！素晴らしい判断力です</div>'+
+      '<div class="fb-body">'+q.explanation+'</div>';
+
+  }else{
+    fb.className="fb fb-ng";
+
+    fb.innerHTML=
+      '<div class="fb-title">✗ 惜しい！一緒に確認しましょう</div>'+
+      '<div class="correct-list" style="margin-bottom:8px">'+
+      '正解の順番：'+correctText+
+      '</div>'+
+      '<div class="fb-body">'+q.explanation+'</div>';
+  }
+
+  document.getElementById("clearBtn").style.display="none";
+
+  var ab=document.getElementById("actionBtn");
+
+  if(cur<qs.length-1){
+    ab.textContent="次の問題へ →";
+    ab.onclick=next;
+  }else{
+    ab.textContent="結果を見る →";
+    ab.onclick=showResult;
+  }
+}
+
+function findDuplicateGroups(vals){
+  var positions={};
+
+  vals.forEach(function(value,index){
+    if(!positions[value]){
+      positions[value]=[];
+    }
+
+    positions[value].push(index);
+  });
+
+  return Object.keys(positions)
+    .filter(function(key){
+      return positions[key].length>1;
+    })
+    .map(function(key){
+      return {
+        value:key,
+        indexes:positions[key]
+      };
+    });
+}
+
+function showDuplicateWarning(groups){
+  var q=qs[cur];
+  var messages=[];
+
+  groups.forEach(function(group){
+    group.indexes.forEach(function(index){
+      var select=document.getElementById("sel"+index);
+
+      if(select){
+        select.classList.add("duplicate");
+      }
+    });
+
+    var event=q.events.find(function(item){
+      return item.key===group.value;
+    });
+
+    var positionText=group.indexes
+      .map(function(index){
+        return (index+1)+"番目";
+      })
+      .join("と");
+
+    messages.push(
+      positionText+
+      "で「"+
+      event.text+
+      "」が重複しています。"
+    );
+  });
+
+  warn(
+    "同じ出来事が重複しています。<br>"+
+    messages.join("<br>")
+  );
+}
+
+function warn(msg){
+  var fb=document.getElementById("feedback");
+
+  fb.className="fb fb-warn";
+  fb.style.display="block";
+
+  fb.innerHTML=
+    '<div class="fb-title">⚠ '+msg+'</div>';
+}
+
+function next(){
+  cur++;
+  render();
+}
+
+function showResult(){
+  document.getElementById("prog").style.width="100%";
+  document.getElementById("progLabel").textContent="完了！";
+
+  var msg=
+    score===5
+      ?"完璧！トリアージセンス抜群！"
+      :score>=3
+        ?"良い調子！解説を読み直してみましょう"
+        :"解説を確認して、もう一度チャレンジ！";
+
+  document.getElementById("scenarioCard").innerHTML=
+    '<div class="result-wrap">'+
+    '<div class="result-score">'+score+' / '+qs.length+'</div>'+
+    '<div class="result-msg">'+msg+'</div>'+
+    '</div>';
+
+  document.getElementById("eventsList").innerHTML="";
+  document.getElementById("answerCard").style.display="none";
+  document.getElementById("feedback").style.display="none";
+  document.getElementById("clearBtn").style.display="none";
+
+  var ab=document.getElementById("actionBtn");
+  ab.textContent="もう一度挑戦する →";
+
+  ab.onclick=function(){
+    location.reload();
+  };
+}
+
+render();
+</script>
+
+</body>
+</html>
