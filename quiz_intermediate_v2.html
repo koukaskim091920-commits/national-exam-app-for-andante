@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>看護トリアージクイズ 中級編 Ver.2.0</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',
+  'Hiragino Sans','Noto Sans JP',sans-serif;
+  background:#f5f5f0;
+  color:#1a1a1a;
+  padding:16px;
+  font-size:15px;
+}
+
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+}
+
+.prog-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.prog-bar{
+  flex:1;
+  height:6px;
+  border-radius:3px;
+  background:#e0e0e0;
+  overflow:hidden;
+}
+
+.prog-fill{
+  height:100%;
+  background:#f59e0b;
+  border-radius:3px;
+  transition:width .4s;
+}
+
+.prog-label{
+  font-size:13px;
+  color:#666;
+  white-space:nowrap;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  border:1px solid #e5e5e5;
+  padding:14px 16px;
+  margin-bottom:14px;
+}
+
+.badge{
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:20px;
+  background:#fef3c7;
+  color:#b45309;
+  margin-bottom:8px;
+}
+
+.scenario{
+  font-size:13px;
+  line-height:1.7;
+  color:#555;
+}
+
+.blank-wrap{
+  margin:12px 0;
+}
+
+.blank-label{
+  font-size:12px;
+  color:#888;
+  margin-bottom:5px;
+  font-weight:500;
+}
+
+select{
+  width:100%;
+  font-size:14px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  transition:border-color .2s, background-color .2s;
+  -webkit-appearance:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+}
+
+select:disabled{
+  opacity:1;
+  -webkit-text-fill-color:currentColor;
+}
+
+select.ok{
+  border-color:#22c55e;
+  background-color:#f0fdf4;
+  color:#166534;
+}
+
+select.ng{
+  border-color:#ef4444;
+  background-color:#fef2f2;
+  color:#991b1b;
+}
+
+.btn-row{
+  display:flex;
+  gap:10px;
+  margin-top:4px;
+}
+
+button{
+  flex:1;
+  font-size:15px;
+  font-weight:600;
+  padding:13px;
+  border-radius:12px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  color:#1a1a1a;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:active{
+  background:#f0f0f0;
+}
+
+#actionBtn{
+  background:#f59e0b;
+  color:#fff;
+  border-color:#f59e0b;
+}
+
+#actionBtn:active{
+  background:#d97706;
+}
+
+.fb{
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  font-size:13px;
+  line-height:1.8;
+  display:none;
+}
+
+.fb-ok{
+  background:#f0fdf4;
+  border:1px solid #86efac;
+  color:#166534;
+}
+
+.fb-ng{
+  background:#fef2f2;
+  border:1px solid #fca5a5;
+  color:#991b1b;
+}
+
+.fb-warn{
+  background:#fffbeb;
+  border:1px solid #fcd34d;
+  color:#92400e;
+}
+
+.fb-title{
+  font-weight:700;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.fb-body{
+  color:#333;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.wrong-item{
+  margin:4px 0;
+  color:#333;
+  font-size:13px;
+}
+
+.result-wrap{
+  text-align:center;
+  padding:24px 0;
+}
+
+.result-score{
+  font-size:48px;
+  font-weight:700;
+  color:#1a1a1a;
+}
+
+.result-msg{
+  font-size:14px;
+  color:#666;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="prog-wrap">
+    <div class="prog-bar">
+      <div class="prog-fill" id="prog" style="width:0%"></div>
+    </div>
+    <span class="prog-label" id="progLabel">1 / 5</span>
+  </div>
+
+  <div class="card" id="scenarioCard">
+    <div class="badge">夜勤帯（基本）中級編 Ver.2.0</div>
+    <p class="scenario" id="scenario"></p>
+  </div>
+
+  <div class="card" id="reportCard">
+    <p style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:12px">
+      先生への報告文
+    </p>
+    <div id="reportArea"></div>
+  </div>
+
+  <div class="fb" id="feedback"></div>
+
+  <div class="btn-row">
+    <button id="clearBtn" onclick="clearAll()">↺ リセット</button>
+    <button id="actionBtn" onclick="handleAction()">答え合わせ →</button>
+  </div>
+
+</div>
+
+<script>
+var qs=[
+{
+  scenario:"夜勤帯、モニターの不整脈アラームが鳴っており、別の病室から転倒の疑いもあります。点滴ポンプの閉塞アラームも鳴っています。",
+  parts:[
+    {type:"text",text:"「先生、"},
+    {type:"blank",idx:0,opts:["転倒の疑いがある患者様","不整脈アラームが鳴っている患者様","退院予定の患者様"]},
+    {type:"text",text:"と、"},
+    {type:"blank",idx:1,opts:["点滴ポンプの閉塞","ナースコールの対応","家族からの電話"]},
+    {type:"text",text:"が同時に発生しています。まず"},
+    {type:"blank",idx:2,opts:["転倒の疑いから","アラームから","家族対応から"]},
+    {type:"text",text:"確認に向かいます。"},
+    {type:"blank",idx:3,opts:["不整脈の可能性","誤嚥の可能性","骨折の可能性"]},
+    {type:"text",text:"もあるため、至急"},
+    {type:"blank",idx:4,opts:["応援と診察をお願いします","記録をお願いします","ご家族への説明をお願いします"]},
+    {type:"text",text:"。」"}
+  ],
+  correct:[
+    "転倒の疑いがある患者様",
+    "点滴ポンプの閉塞",
+    "転倒の疑いから",
+    "不整脈の可能性",
+    "応援と診察をお願いします"
+  ],
+  explanation:"転倒の疑いを最初に伝えることで緊急性が伝わります。複数の出来事をSBARの流れで整理して報告することが大切です。"
+},
+{
+  scenario:"日勤帯、患者Aが胸痛と冷や汗を訴えており、患者Bでは経管栄養の逆流が疑われます。",
+  parts:[
+    {type:"text",text:"「先生、○○号室の患者様が"},
+    {type:"blank",idx:0,opts:["胸痛と冷や汗を訴えています","眠れないと訴えています","足がつると訴えています"]},
+    {type:"text",text:"。同時に別の患者様で"},
+    {type:"blank",idx:1,opts:["経管栄養の逆流が疑われます","退院の準備が必要です","血糖測定の時間です"]},
+    {type:"text",text:"。胸痛の患者様は"},
+    {type:"blank",idx:2,opts:["急性冠症候群の可能性","低血糖の可能性","せん妄の可能性"]},
+    {type:"text",text:"があります。至急"},
+    {type:"blank",idx:3,opts:["心電図と診察をお願いします","記録をお願いします","家族への連絡をお願いします"]},
+    {type:"text",text:"。経管栄養は"},
+    {type:"blank",idx:4,opts:["すでに中止しています","継続しています","速度を落としています"]},
+    {type:"text",text:"。」"}
+  ],
+  correct:[
+    "胸痛と冷や汗を訴えています",
+    "経管栄養の逆流が疑われます",
+    "急性冠症候群の可能性",
+    "心電図と診察をお願いします",
+    "すでに中止しています"
+  ],
+  explanation:"胸痛と冷汗はレッドフラグです。すでに取った対応を報告に含めることで、医師が次の指示を出しやすくなります。"
+},
+{
+  scenario:"夜勤帯、透析中の患者様の血圧が低下し、認知症の患者様が転落しそうになっています。",
+  parts:[
+    {type:"text",text:"「先生、透析中の患者様の"},
+    {type:"blank",idx:0,opts:["血圧が低下しています","体温が上昇しています","SpO2が低下しています"]},
+    {type:"text",text:"。同時に認知症の患者様が"},
+    {type:"blank",idx:1,opts:["ベッドから降りようとしています","食事を拒否しています","点滴を抜こうとしています"]},
+    {type:"text",text:"。透析中の血圧低下は"},
+    {type:"blank",idx:2,opts:["ショックに進行する危険","誤嚥につながる危険","転倒につながる危険"]},
+    {type:"text",text:"があります。まず透析の患者様に対応し、"},
+    {type:"blank",idx:3,opts:["応援をお願いします","記録をお願いします","ご家族への連絡をお願いします"]},
+    {type:"text",text:"。認知症の患者様は現在"},
+    {type:"blank",idx:4,opts:["スタッフがそばに付き添っています","ベッドに戻っています","ご家族が対応しています"]},
+    {type:"text",text:"。」"}
+  ],
+  correct:[
+    "血圧が低下しています",
+    "ベッドから降りようとしています",
+    "ショックに進行する危険",
+    "応援をお願いします",
+    "スタッフがそばに付き添っています"
+  ],
+  explanation:"処置中の急変を最優先で報告します。すでに取っている対応を伝えることで、医師が状況を判断しやすくなります。"
+},
+{
+  scenario:"夜勤帯、SpO2が88%に低下し、術後患者様の創部から出血がみられます。",
+  parts:[
+    {type:"text",text:"「先生、○○号室の患者様の"},
+    {type:"blank",idx:0,opts:["SpO2が88%まで低下しています","体温が38.5℃に上昇しています","血圧が低下しています"]},
+    {type:"text",text:"。また術後の患者様の"},
+    {type:"blank",idx:1,opts:["創部に鮮血がにじんでいます","点滴が漏れています","ドレーンが抜けています"]},
+    {type:"text",text:"。SpO2の患者様は"},
+    {type:"blank",idx:2,opts:["低酸素状態の可能性","低血糖状態の可能性","脱水状態の可能性"]},
+    {type:"text",text:"があります。"},
+    {type:"blank",idx:3,opts:["酸素投与の準備を進めています","経管栄養を中止しました","点滴を止めました"]},
+    {type:"text",text:"。創部出血は"},
+    {type:"blank",idx:4,opts:["圧迫止血を開始しました","ガーゼ交換を行いました","バイタルを測定しました"]},
+    {type:"text",text:"。至急診察をお願いします。」"}
+  ],
+  correct:[
+    "SpO2が88%まで低下しています",
+    "創部に鮮血がにじんでいます",
+    "低酸素状態の可能性",
+    "酸素投与の準備を進めています",
+    "圧迫止血を開始しました"
+  ],
+  explanation:"複数の緊急事態が重なる場面では、具体的な数値と、すでに取った対応を簡潔に伝えることが重要です。"
+},
+{
+  scenario:"日勤帯、カリウムのパニック値の連絡があり、嚥下調整食の患者様に普通食が誤配膳されています。",
+  parts:[
+    {type:"text",text:"「先生、検査室から"},
+    {type:"blank",idx:0,opts:["カリウム値がパニック値との連絡が入りました","ナトリウム値が低いとの連絡が入りました","血糖値が高いとの連絡が入りました"]},
+    {type:"text",text:"。値は"},
+    {type:"blank",idx:1,opts:["6.8mEq/Lです","3.2mEq/Lです","150mEq/Lです"]},
+    {type:"text",text:"。"},
+    {type:"blank",idx:2,opts:["致死性不整脈につながる可能性","低血糖につながる可能性","脱水につながる可能性"]},
+    {type:"text",text:"があります。また嚥下調整食の患者様に"},
+    {type:"blank",idx:3,opts:["普通食が誤配膳されており、すでに食事を止めました","点滴が漏れています","内服薬を飲み忘れています"]},
+    {type:"text",text:"。至急"},
+    {type:"blank",idx:4,opts:["心電図確認と診察をお願いします","血糖測定をお願いします","輸液の調整をお願いします"]},
+    {type:"text",text:"。」"}
+  ],
+  correct:[
+    "カリウム値がパニック値との連絡が入りました",
+    "6.8mEq/Lです",
+    "致死性不整脈につながる可能性",
+    "普通食が誤配膳されており、すでに食事を止めました",
+    "心電図確認と診察をお願いします"
+  ],
+  explanation:"パニック値の報告では具体的な数値を伝えることが重要です。誤配膳への対応も含めると、次の判断につながります。"
+}
+];
+
+/* 配列をランダムに並べ替える */
+function shuffleArray(array){
+  var copied=array.slice();
+
+  for(var i=copied.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=copied[i];
+    copied[i]=copied[j];
+    copied[j]=temp;
+  }
+
+  return copied;
+}
+
+/* 問題順をランダム化 */
+qs=shuffleArray(qs);
+
+var cur=0;
+var score=0;
+var answered=false;
+var userAnswers=[];
+
+function render(){
+  answered=false;
+  userAnswers=[];
+
+  var q=qs[cur];
+
+  document.getElementById("prog").style.width=
+    Math.round(cur/qs.length*100)+"%";
+
+  document.getElementById("progLabel").textContent=
+    (cur+1)+" / "+qs.length;
+
+  document.getElementById("scenario").textContent=
+    "📍 "+q.scenario;
+
+  var area=document.getElementById("reportArea");
+  area.innerHTML="";
+
+  var blankIdx=0;
+
+  q.parts.forEach(function(part){
+    if(part.type==="text"){
+      var span=document.createElement("span");
+
+      span.style.cssText=
+        "font-size:14px;line-height:1.8;color:#1a1a1a";
+
+      span.textContent=part.text;
+      area.appendChild(span);
+
+    }else{
+      var index=blankIdx;
+      blankIdx++;
+
+      userAnswers.push("");
+
+      var wrap=document.createElement("div");
+      wrap.className="blank-wrap";
+
+      var label=document.createElement("div");
+      label.className="blank-label";
+      label.textContent="【"+(index+1)+"】を選んでください";
+
+      var select=document.createElement("select");
+      select.id="blank"+index;
+
+      select.onchange=function(){
+        userAnswers[index]=this.value;
+      };
+
+      var defaultOption=document.createElement("option");
+      defaultOption.value="";
+      defaultOption.textContent="選択してください";
+      select.appendChild(defaultOption);
+
+      /* 各空欄の選択肢をランダム化 */
+      var shuffledOptions=shuffleArray(part.opts);
+
+      shuffledOptions.forEach(function(optionText){
+        var option=document.createElement("option");
+        option.value=optionText;
+        option.textContent=optionText;
+        select.appendChild(option);
+      });
+
+      wrap.appendChild(label);
+      wrap.appendChild(select);
+      area.appendChild(wrap);
+    }
+  });
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
+
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="答え合わせ →";
+  actionButton.onclick=handleAction;
+
+  document.getElementById("clearBtn").style.display="";
+}
+
+function clearAll(){
+  if(answered)return;
+
+  var blankCount=qs[cur].parts.filter(function(part){
+    return part.type==="blank";
+  }).length;
+
+  for(var i=0;i<blankCount;i++){
+    var select=document.getElementById("blank"+i);
+
+    if(select){
+      select.value="";
+      select.className="";
+      userAnswers[i]="";
+    }
+  }
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
+}
+
+function handleAction(){
+  if(answered){
+    next();
+  }else{
+    check();
+  }
+}
+
+function check(){
+  var q=qs[cur];
+
+  if(!userAnswers.every(function(value){
+    return value!=="";
+  })){
+    warn("すべての空欄を選択してください。");
+    return;
+  }
+
+  answered=true;
+
+  var allCorrect=
+    JSON.stringify(userAnswers)===JSON.stringify(q.correct);
+
+  if(allCorrect){
+    score++;
+  }
+
+  var blankIndex=0;
+
+  q.parts.forEach(function(part){
+    if(part.type==="blank"){
+      var select=document.getElementById("blank"+blankIndex);
+
+      if(select){
+        select.disabled=true;
+
+        if(userAnswers[blankIndex]===q.correct[blankIndex]){
+          select.className="ok";
+        }else{
+          select.className="ng";
+        }
+      }
+
+      blankIndex++;
+    }
+  });
+
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="block";
+
+  if(allCorrect){
+    feedback.className="fb fb-ok";
+
+    feedback.innerHTML=
+      '<div class="fb-title">✓ 全問正解！完璧な報告文です</div>'+
+      '<div class="fb-body">'+q.explanation+'</div>';
+
+  }else{
+    var wrongItems="";
+
+    userAnswers.forEach(function(answer,index){
+      if(answer!==q.correct[index]){
+        wrongItems+=
+          '<div class="wrong-item">'+
+          '【'+(index+1)+'】正解：'+
+          '<strong>'+q.correct[index]+'</strong>'+
+          '</div>';
+      }
+    });
+
+    feedback.className="fb fb-ng";
+
+    feedback.innerHTML=
+      '<div class="fb-title">✗ 惜しい！確認しましょう</div>'+
+      '<div style="margin-bottom:8px">'+wrongItems+'</div>'+
+      '<div class="fb-body">'+q.explanation+'</div>';
+  }
+
+  document.getElementById("clearBtn").style.display="none";
+
+  var actionButton=document.getElementById("actionBtn");
+
+  if(cur<qs.length-1){
+    actionButton.textContent="次の問題へ →";
+    actionButton.onclick=next;
+  }else{
+    actionButton.textContent="結果を見る →";
+    actionButton.onclick=showResult;
+  }
+}
+
+function warn(message){
+  var feedback=document.getElementById("feedback");
+
+  feedback.className="fb fb-warn";
+  feedback.style.display="block";
+
+  feedback.innerHTML=
+    '<div class="fb-title">⚠ '+message+'</div>';
+}
+
+function next(){
+  cur++;
+  render();
+}
+
+function showResult(){
+  document.getElementById("prog").style.width="100%";
+  document.getElementById("progLabel").textContent="完了！";
+
+  var message=
+    score===5
+      ?"完璧！報告文マスターですね！"
+      :score>=3
+        ?"良い調子！解説を読み直してみましょう"
+        :"解説を確認して、もう一度チャレンジ！";
+
+  document.getElementById("scenarioCard").innerHTML=
+    '<div class="result-wrap">'+
+    '<div class="result-score">'+score+' / '+qs.length+'</div>'+
+    '<div class="result-msg">'+message+'</div>'+
+    '</div>';
+
+  document.getElementById("reportCard").style.display="none";
+  document.getElementById("feedback").style.display="none";
+  document.getElementById("clearBtn").style.display="none";
+
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="もう一度挑戦する →";
+
+  actionButton.onclick=function(){
+    location.reload();
+  };
+}
+
+render();
+</script>
+
+</body>
+</html>
