@@ -662,17 +662,18 @@ function showResult(){
         ?"良い調子！解説を読み直してみましょう"
         :"解説を確認して、もう一度チャレンジ！";
 
-document.getElementById("scenarioCard").innerHTML=
-'<div class="result-wrap">'+
-'<div class="result-score">'+score+' / '+qs.length+'</div>'+
-'<div class="result-msg">'+msg+'</div>'+
-'<br><br>'+
-'<button onclick="location.reload()">🔄 もう一度挑戦する</button>'+
-'<br><br>'+
-'<button onclick="location.href=\'index.html\'">🏠 ホームに戻る</button>'+
-'</div>';
-
+document.getElementById("scenarioCard").innerHTML =
+  '<div class="result-wrap">' +
+    '<div class="result-score">' + score + ' / ' + qs.length + '</div>' +
+    '<div class="result-msg">' + msg + '</div>' +
+  '</div>';
   
+var ab = document.getElementById("actionBtn");
+ab.textContent = "もう一度挑戦する →";
+
+ab.onclick = function () {
+  location.reload();
+};  
 }
 
 render();
