@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<title>看護トリアージクイズ 初級編</title>
+<title>看護トリアージクイズ 上級編 Ver.2.0</title>
 
 <style>
 *{
@@ -45,7 +45,7 @@ body{
 
 .prog-fill{
   height:100%;
-  background:#3b82f6;
+  background:#8b5cf6;
   border-radius:3px;
   transition:width .4s;
 }
@@ -70,92 +70,60 @@ body{
   font-weight:600;
   padding:3px 10px;
   border-radius:20px;
-  background:#dbeafe;
-  color:#1d4ed8;
+  background:#ede9fe;
+  color:#6d28d9;
   margin-bottom:8px;
 }
 
 .scenario{
-  font-size:14px;
+  font-size:13px;
   line-height:1.7;
-  color:#333;
+  color:#555;
 }
 
-.ev-item{
+.kw-list{
   display:flex;
-  align-items:flex-start;
-  gap:8px;
-  padding:10px 12px;
-  background:#f9f9f9;
-  border-radius:10px;
-  border:1px solid #e5e5e5;
-  margin-bottom:8px;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:4px;
 }
 
-.ev-key{
-  flex-shrink:0;
-  font-weight:700;
-  color:#3b82f6;
-  font-size:14px;
-  min-width:24px;
+.kw-tag{
+  display:inline-flex;
+  align-items:center;
+  font-size:13px;
+  padding:5px 11px;
+  border-radius:20px;
+  background:#ede9fe;
+  color:#6d28d9;
+  border:1px solid #c4b5fd;
+  font-weight:500;
 }
 
-.ev-text{
-  font-size:14px;
-  line-height:1.6;
-  color:#1a1a1a;
-}
-
-.rank-section{
-  margin-bottom:12px;
-}
-
-.rank-label{
-  font-size:14px;
-  font-weight:600;
-  color:#1a1a1a;
-  margin-bottom:6px;
-}
-
-select{
+textarea{
   width:100%;
-  font-size:14px;
-  padding:10px 12px;
-  border-radius:10px;
+  min-height:140px;
+  font-size:15px;
+  line-height:1.7;
+  padding:12px;
+  border-radius:12px;
   border:1.5px solid #d1d5db;
   background:#fff;
   color:#1a1a1a;
-  transition:border-color .2s, background-color .2s;
-  -webkit-appearance:none;
-  appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
+  resize:vertical;
+  font-family:inherit;
 }
 
-/* 重複した回答 */
-select.duplicate{
-  border-color:#ef4444;
-  background-color:#fef2f2;
-  color:#991b1b;
+textarea:focus{
+  outline:none;
+  border-color:#8b5cf6;
 }
 
-/* 答え合わせ後 */
-select.ok{
-  border-color:#22c55e;
-  background-color:#f0fdf4;
-  color:#166534;
-}
-
-select.ng{
-  border-color:#ef4444;
-  background-color:#fef2f2;
-  color:#991b1b;
-}
-
-select:disabled{
+textarea:disabled{
   opacity:1;
-  -webkit-text-fill-color:currentColor;
+  background:#f9f9f9;
+  color:#444;
+  -webkit-text-fill-color:#444;
 }
 
 .btn-row{
@@ -182,13 +150,13 @@ button:active{
 }
 
 #actionBtn{
-  background:#3b82f6;
+  background:#8b5cf6;
   color:#fff;
-  border-color:#3b82f6;
+  border-color:#8b5cf6;
 }
 
 #actionBtn:active{
-  background:#2563eb;
+  background:#7c3aed;
 }
 
 .fb{
@@ -203,13 +171,11 @@ button:active{
 .fb-ok{
   background:#f0fdf4;
   border:1px solid #86efac;
-  color:#166534;
 }
 
-.fb-ng{
-  background:#fef2f2;
-  border:1px solid #fca5a5;
-  color:#991b1b;
+.fb-info{
+  background:#fff;
+  border:1px solid #e5e5e5;
 }
 
 .fb-warn{
@@ -224,15 +190,67 @@ button:active{
   font-size:14px;
 }
 
-.fb-body{
+.found-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:12px;
+  font-weight:500;
+}
+
+.order-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#fef3c7;
+  color:#92400e;
+  font-size:12px;
+  border:1px solid #fcd34d;
+}
+
+.miss-tag{
+  display:inline-block;
+  margin:2px;
+  padding:3px 9px;
+  border-radius:20px;
+  background:#f3f4f6;
+  color:#6b7280;
+  font-size:12px;
+  border:1px solid #e5e5e5;
+}
+
+.tip-item{
+  margin:6px 0;
+  padding-left:12px;
+  border-left:3px solid #c4b5fd;
+  color:#333;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.model-box{
+  margin:12px 0 0;
+  padding:12px;
+  background:#f5f3ff;
+  border-radius:10px;
+  border:1px solid #ddd6fe;
+}
+
+.model-label{
+  font-size:11px;
+  color:#7c3aed;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.model-text{
   color:#333;
   font-size:13px;
   line-height:1.7;
-}
-
-.correct-list div{
-  margin:4px 0;
-  color:#333;
 }
 
 .result-wrap{
@@ -266,24 +284,38 @@ button:active{
   </div>
 
   <div class="card" id="scenarioCard">
-    <div class="badge">夜勤帯（基本）初級編</div>
+    <div class="badge">夜勤帯（基本）上級編 Ver.2.0</div>
     <p class="scenario" id="scenario"></p>
   </div>
 
-  <div id="eventsList"></div>
-
-  <div class="card" id="answerCard">
-    <p style="font-size:13px;color:#666;margin-bottom:12px">
-      優先順位を選んでください
+  <div class="card" id="keywordCard">
+    <p style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">
+      🔑 必ず使うキーワード
     </p>
-    <div id="dropdowns"></div>
+
+    <p style="font-size:12px;color:#888;margin-bottom:10px">
+      表示順ではなく、報告として適切な順番を考えて文章にしてください。
+    </p>
+
+    <div class="kw-list" id="keywords"></div>
+  </div>
+
+  <div id="inputArea" style="margin-bottom:14px">
+    <p style="font-size:13px;color:#666;margin-bottom:8px">
+      先生への報告文を自由に書いてください
+    </p>
+
+    <textarea
+      id="userInput"
+      placeholder="キーワードをすべて使い、報告の順番を考えて、自分の言葉で書いてみましょう。">
+    </textarea>
   </div>
 
   <div class="fb" id="feedback"></div>
 
   <div class="btn-row">
-    <button id="clearBtn" onclick="clearAll()">↺ リセット</button>
-    <button id="actionBtn" onclick="handleAction()">答え合わせ →</button>
+    <button id="clearBtn" onclick="clearInput()">↺ リセット</button>
+    <button id="actionBtn" onclick="handleAction()">採点する →</button>
   </div>
 
 </div>
@@ -291,63 +323,85 @@ button:active{
 <script>
 var qs=[
 {
-  scenario:"夜勤帯、以下の4つが同時に発生しました。",
-  events:[
-    {key:"A",text:"モニターの不整脈アラームが鳴っている"},
-    {key:"B",text:"別の病室から「ドスン」という音がして、患者様が転倒した可能性がある"},
-    {key:"C",text:"別の患者様がナースステーションに来て「聞きたいことがある」と話している"},
-    {key:"D",text:"点滴ポンプの閉塞アラームが鳴っている"}
+  scenario:"夜勤帯、モニターの不整脈アラームが鳴っており、別の病室から転倒の疑いもあります。点滴ポンプの閉塞アラームも同時に鳴っています。",
+  keywords:[
+    "転倒の疑い",
+    "不整脈アラーム",
+    "点滴閉塞",
+    "急変の可能性",
+    "応援をお願い"
   ],
-  correct:["B","A","D","C"],
-  explanation:"【1番目：転倒の疑い】すでに身体的リスクが発生している可能性があり最優先です。【2番目：不整脈アラーム】致死性不整脈の可能性があるため次に確認します。【3番目：点滴アラーム】薬液が止まると治療に影響しますが数分の猶予があります。【4番目：ナースステーション来訪】自力で歩いてこられており安定していると判断できます。"
+  modelAnswer:"「先生、転倒の疑いがある患者様と不整脈アラーム、点滴閉塞が同時に発生しています。急変の可能性があるため、至急応援をお願いします。」",
+  tips:[
+    "「転倒の疑い」を最初に伝えることで、緊急度が一瞬で伝わります",
+    "数字や部屋番号を加えると、さらに具体的になります",
+    "状況・背景・評価・依頼の流れを意識してみましょう"
+  ]
 },
 {
-  scenario:"日勤帯、以下の4つが重なりました。",
-  events:[
-    {key:"A",text:"患者Aが「胸が痛い、冷や汗が出る」とナースコールを鳴らした"},
-    {key:"B",text:"患者Bの経管栄養が逆流している様子がある"},
-    {key:"C",text:"退院予定の患者Cのご家族が迎えに来て説明を待っている"},
-    {key:"D",text:"患者Dの血糖測定の時間になった"}
+  scenario:"日勤帯、患者Aが胸痛と冷や汗を訴えており、患者Bでは経管栄養の逆流が疑われます。",
+  keywords:[
+    "胸痛と冷や汗",
+    "急性冠症候群の可能性",
+    "心電図をお願い",
+    "経管栄養を中止"
   ],
-  correct:["A","B","D","C"],
-  explanation:"【1番目：胸痛・冷汗】急性冠症候群を疑う最重要サインです。【2番目：経管栄養逆流】誤嚥・窒息のリスクがあり早急な対応が必要です。【3番目：血糖測定】定時業務ですが遅延を最小限にします。【4番目：ご家族対応】一声かけて待っていただけます。"
+  modelAnswer:"「先生、○○号室の患者様が胸痛と冷や汗を訴えています。急性冠症候群の可能性があるため、心電図をお願いします。別の患者様で経管栄養の逆流があり、経管栄養を中止しました。」",
+  tips:[
+    "「胸痛と冷や汗」をセットで伝えることで緊急度が伝わります",
+    "すでに取った対応を含めると、医師が次の指示を出しやすくなります",
+    "複数患者がいる場合は、優先順位を明確にするとさらに良くなります"
+  ]
 },
 {
-  scenario:"夜勤帯、以下の4つが発生しました。",
-  events:[
-    {key:"A",text:"透析中の患者様のモニターで血圧低下アラームが鳴っている"},
-    {key:"B",text:"認知症の患者様が「家に帰る」と言ってベッドを降りようとしている"},
-    {key:"C",text:"新規入院患者様がまもなく到着するとの連絡が入った"},
-    {key:"D",text:"別の患者様のご家族から状態確認の電話がかかってきた"}
+  scenario:"夜勤帯、透析中の患者様の血圧が低下し、認知症の患者様が転落しそうになっています。",
+  keywords:[
+    "透析中の血圧低下",
+    "ショックの危険",
+    "転落リスク",
+    "応援をお願い"
   ],
-  correct:["A","B","C","D"],
-  explanation:"【1番目：透析中の血圧低下】処置中の急変は最優先です。【2番目：転落リスク】今まさに転倒しそうな危険な状態です。【3番目：新規入院】到着前に準備が必要です。【4番目：電話対応】折り返し対応が可能です。"
+  modelAnswer:"「先生、透析中の患者様の血圧低下があり、ショックの危険があります。同時に認知症の患者様に転落リスクがあります。至急応援をお願いします。」",
+  tips:[
+    "処置中の急変は、特に緊急度が高いことを意識しましょう",
+    "「ショックの危険」は医師への重要な緊急サインです",
+    "スタッフの現在の対応状況も加えると、状況がさらに伝わります"
+  ]
 },
 {
-  scenario:"夜勤帯、複数の出来事が重なりました。",
-  events:[
-    {key:"A",text:"SpO2モニターのアラームが鳴り88%を示している"},
-    {key:"B",text:"術後患者様の創部ガーゼに鮮血がにじんでいると別スタッフから報告があった"},
-    {key:"C",text:"患者様から「眠れないので話し相手になってほしい」とナースコールがあった"},
-    {key:"D",text:"点滴の滴下速度がいつもより速いことに気づいた"}
+  scenario:"夜勤帯、SpO2が88%に低下し、術後患者様の創部から出血がみられます。",
+  keywords:[
+    "SpO2が88%",
+    "低酸素の可能性",
+    "酸素投与を準備",
+    "創部に鮮血",
+    "圧迫止血"
   ],
-  correct:["A","B","D","C"],
-  explanation:"【1番目：SpO2低下】88%は低酸素の重要なサインです。【2番目：創部出血】出血が進んでいる可能性があります。【3番目：滴下速度】過剰投与のリスクがあります。【4番目：話し相手】緊急性は最も低いです。"
+  modelAnswer:"「先生、○○号室の患者様のSpO2が88%まで低下しています。低酸素の可能性があり、酸素投与を準備しました。また術後の患者様の創部に鮮血がにじんでいるため、圧迫止血を開始しました。至急診察をお願いします。」",
+  tips:[
+    "SpO2の具体的な数値を伝えると、緊急度が伝わります",
+    "すでに取った行動を含めることが重要です",
+    "複数の緊急事態を簡潔にまとめる力を意識しましょう"
+  ]
 },
 {
-  scenario:"日勤帯、同時に複数のことが起きました。",
-  events:[
-    {key:"A",text:"嚥下調整食のはずの患者様に普通食が誤配膳されているのに気づいた"},
-    {key:"B",text:"患者様が「足のふくらはぎが片方だけ腫れて痛い」と訴えた"},
-    {key:"C",text:"退院指導の時間になった患者様が待っている"},
-    {key:"D",text:"検査室から「採血結果のカリウム値がパニック値です」と電話が入った"}
+  scenario:"日勤帯、検査室からカリウムのパニック値の連絡があり、嚥下調整食の患者様に普通食が誤配膳されています。",
+  keywords:[
+    "カリウムパニック値",
+    "致死性不整脈の可能性",
+    "心電図をお願い",
+    "誤配膳を中止"
   ],
-  correct:["D","A","B","C"],
-  explanation:"【1番目：カリウムパニック値】致死性不整脈につながる最緊急の電解質異常です。【2番目：誤配膳】嚥下障害患者への誤配膳は誤嚥・窒息の危険があります。【3番目：ふくらはぎの腫れ】深部静脈血栓症が疑われます。【4番目：退院指導】生命的な緊急性は最も低いです。"
+  modelAnswer:"「先生、検査室からカリウムパニック値の連絡が入りました。致死性不整脈の可能性があるため、至急心電図をお願いします。また嚥下調整食の患者様への誤配膳があり、すでに誤配膳を中止しました。」",
+  tips:[
+    "「パニック値」と伝えることで緊急連絡であることが伝わります",
+    "具体的なリスクを明示すると、医師が優先度を判断しやすくなります",
+    "誤配膳への対応も報告に含めましょう"
+  ]
 }
 ];
 
-/* Fisher–Yates方式で配列をランダムに並べ替える */
+/* 配列をランダムに並べ替える */
 function shuffleArray(array){
   var copied=array.slice();
 
@@ -379,271 +433,220 @@ function render(){
   document.getElementById("progLabel").textContent=
     (cur+1)+" / "+qs.length;
 
-  document.getElementById("scenario").textContent=q.scenario;
+  document.getElementById("scenario").textContent=
+    "📍 "+q.scenario;
 
-  var el=document.getElementById("eventsList");
-  el.innerHTML="";
+  var keywordArea=document.getElementById("keywords");
+  keywordArea.innerHTML="";
 
-  q.events.forEach(function(ev){
-    var d=document.createElement("div");
-    d.className="ev-item";
+  /* 表示用キーワードだけランダム化する */
+  var displayedKeywords=shuffleArray(q.keywords);
 
-    d.innerHTML=
-      '<span class="ev-key">'+ev.key+'）</span>'+
-      '<span class="ev-text">'+ev.text+'</span>';
-
-    el.appendChild(d);
+  displayedKeywords.forEach(function(keyword){
+    var span=document.createElement("span");
+    span.className="kw-tag";
+    span.textContent=keyword;
+    keywordArea.appendChild(span);
   });
 
-  var dd=document.getElementById("dropdowns");
-  dd.innerHTML="";
+  var input=document.getElementById("userInput");
+  input.value="";
+  input.disabled=false;
+  input.style.display="";
 
-  ["1番目","2番目","3番目","4番目"].forEach(function(label,i){
-    var wrap=document.createElement("div");
-    wrap.className="rank-section";
+  document.getElementById("inputArea").style.display="";
+  document.getElementById("keywordCard").style.display="";
 
-    var lbl=document.createElement("div");
-    lbl.className="rank-label";
-    lbl.textContent=label;
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
 
-    var sel=document.createElement("select");
-    sel.id="sel"+i;
-
-    sel.addEventListener("change",function(){
-      clearDuplicateDisplay();
-    });
-
-    var def=document.createElement("option");
-    def.value="";
-    def.textContent="選択してください";
-    sel.appendChild(def);
-
-    /* 各プルダウンの選択肢をランダム化 */
-    var shuffledEvents=shuffleArray(q.events);
-
-    shuffledEvents.forEach(function(ev){
-      var op=document.createElement("option");
-      op.value=ev.key;
-      op.textContent=ev.text;
-      sel.appendChild(op);
-    });
-
-    wrap.appendChild(lbl);
-    wrap.appendChild(sel);
-    dd.appendChild(wrap);
-  });
-
-  var fb=document.getElementById("feedback");
-  fb.style.display="none";
-  fb.innerHTML="";
-  fb.className="fb";
-
-  var ab=document.getElementById("actionBtn");
-  ab.textContent="答え合わせ →";
-  ab.onclick=handleAction;
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="採点する →";
+  actionButton.onclick=handleAction;
+  actionButton.disabled=false;
 
   document.getElementById("clearBtn").style.display="";
 }
 
-function clearDuplicateDisplay(){
+function clearInput(){
   if(answered)return;
 
-  for(var i=0;i<4;i++){
-    var select=document.getElementById("sel"+i);
+  document.getElementById("userInput").value="";
 
-    if(select){
-      select.classList.remove("duplicate");
-    }
-  }
-
-  var fb=document.getElementById("feedback");
-
-  if(fb.classList.contains("fb-warn")){
-    fb.style.display="none";
-    fb.innerHTML="";
-    fb.className="fb";
-  }
-}
-
-function clearAll(){
-  if(answered)return;
-
-  for(var i=0;i<4;i++){
-    var select=document.getElementById("sel"+i);
-
-    if(select){
-      select.value="";
-      select.className="";
-    }
-  }
-
-  var fb=document.getElementById("feedback");
-  fb.style.display="none";
-  fb.innerHTML="";
-  fb.className="fb";
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="none";
+  feedback.innerHTML="";
+  feedback.className="fb";
 }
 
 function handleAction(){
   if(answered){
     next();
   }else{
-    check();
+    evaluate();
   }
 }
 
-function check(){
-  var q=qs[cur];
-  var vals=[];
+/* 本文中にキーワードが存在するか確認 */
+function getUsedKeywords(text,keywords){
+  return keywords.filter(function(keyword){
+    return text.indexOf(keyword)>=0;
+  });
+}
 
-  clearDuplicateDisplay();
+/* 正しい順番で使われているキーワードを確認 */
+function getCorrectOrderKeywords(text,keywords){
+  var lastPosition=-1;
+  var correctOrder=[];
 
-  for(var i=0;i<4;i++){
-    var select=document.getElementById("sel"+i);
+  keywords.forEach(function(keyword){
+    var position=text.indexOf(keyword);
 
-    if(!select||!select.value){
-      warn("4つすべて選択してください。");
-      return;
+    if(position>=0 && position>lastPosition){
+      correctOrder.push(keyword);
+      lastPosition=position;
     }
+  });
 
-    vals.push(select.value);
+  return correctOrder;
+}
+
+function evaluate(){
+  var text=document.getElementById("userInput").value.trim();
+
+  if(!text || text.length<5){
+    warn("報告文を入力してください。");
+    return;
   }
 
-  var duplicateGroups=findDuplicateGroups(vals);
+  var q=qs[cur];
 
-  if(duplicateGroups.length>0){
-    showDuplicateWarning(duplicateGroups);
-    return;
+  var usedKeywords=getUsedKeywords(text,q.keywords);
+  var correctOrderKeywords=getCorrectOrderKeywords(text,q.keywords);
+
+  var missingKeywords=q.keywords.filter(function(keyword){
+    return usedKeywords.indexOf(keyword)<0;
+  });
+
+  var wrongOrderKeywords=usedKeywords.filter(function(keyword){
+    return correctOrderKeywords.indexOf(keyword)<0;
+  });
+
+  var allUsed=usedKeywords.length===q.keywords.length;
+  var correctOrder=correctOrderKeywords.length===q.keywords.length;
+  var isCorrect=allUsed && correctOrder;
+
+  if(isCorrect){
+    score++;
   }
 
   answered=true;
 
-  var ok=JSON.stringify(vals)===JSON.stringify(q.correct);
+  document.getElementById("userInput").disabled=true;
 
-  if(ok){
-    score++;
-  }
+  var feedback=document.getElementById("feedback");
+  feedback.style.display="block";
 
-  for(var j=0;j<4;j++){
-    var currentSelect=document.getElementById("sel"+j);
-    currentSelect.disabled=true;
+  var correctHtml=correctOrderKeywords.map(function(keyword){
+    return '<span class="found-tag">✓ '+keyword+'</span>';
+  }).join(" ");
 
-    if(vals[j]===q.correct[j]){
-      currentSelect.className="ok";
-    }else{
-      currentSelect.className="ng";
-    }
-  }
+  var wrongOrderHtml=wrongOrderKeywords.map(function(keyword){
+    return '<span class="order-tag">↔ '+keyword+'</span>';
+  }).join(" ");
 
-  var fb=document.getElementById("feedback");
-  fb.style.display="block";
+  var missingHtml=missingKeywords.map(function(keyword){
+    return '<span class="miss-tag">'+keyword+'</span>';
+  }).join(" ");
 
-  var correctText=q.correct.map(function(key,index){
-    var event=q.events.find(function(item){
-      return item.key===key;
-    });
-
-    return "<div>"+(index+1)+"番目："+event.text+"</div>";
+  var tipsHtml=q.tips.map(function(tip){
+    return '<div class="tip-item">'+tip+'</div>';
   }).join("");
 
-  if(ok){
-    fb.className="fb fb-ok";
+  var modelHtml=
+    '<div class="model-box">'+
+      '<div class="model-label">参考：模範解答</div>'+
+      '<div class="model-text">'+q.modelAnswer+'</div>'+
+    '</div>';
 
-    fb.innerHTML=
-      '<div class="fb-title">✓ 正解！素晴らしい判断力です</div>'+
-      '<div class="fb-body">'+q.explanation+'</div>';
+  if(isCorrect){
+    feedback.className="fb fb-ok";
+
+    feedback.innerHTML=
+      '<div class="fb-title" style="color:#166534">'+
+        '⭐ 素晴らしい！すべてのキーワードを適切な順番で使えています'+
+      '</div>'+
+      '<div style="margin-bottom:12px">'+correctHtml+'</div>'+
+      '<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">'+
+        'さらに良くなるヒント'+
+      '</div>'+
+      tipsHtml+
+      modelHtml;
 
   }else{
-    fb.className="fb fb-ng";
+    feedback.className="fb fb-info";
 
-    fb.innerHTML=
-      '<div class="fb-title">✗ 惜しい！一緒に確認しましょう</div>'+
-      '<div class="correct-list" style="margin-bottom:8px">'+
-      '正解の順番：'+correctText+
+    var summary="";
+
+    if(correctOrderKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#888;margin-bottom:4px">'+
+          '適切な順番で使えたキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:10px">'+correctHtml+'</div>';
+    }
+
+    if(wrongOrderKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#92400e;margin-bottom:4px">'+
+          '使われていますが、報告の順番を見直したいキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:10px">'+wrongOrderHtml+'</div>';
+    }
+
+    if(missingKeywords.length>0){
+      summary+=
+        '<div style="font-size:12px;color:#888;margin-bottom:4px">'+
+          'まだ使われていないキーワード：'+
+        '</div>'+
+        '<div style="margin-bottom:12px">'+missingHtml+'</div>';
+    }
+
+    feedback.innerHTML=
+      '<div class="fb-title" style="color:#6d28d9">'+
+        '👍 キーワードと報告順を確認してみましょう'+
       '</div>'+
-      '<div class="fb-body">'+q.explanation+'</div>';
+      summary+
+      '<div style="font-weight:600;color:#1a1a1a;margin-bottom:6px">'+
+        'より良くなるヒント'+
+      '</div>'+
+      tipsHtml+
+      modelHtml;
   }
 
   document.getElementById("clearBtn").style.display="none";
 
-  var ab=document.getElementById("actionBtn");
+  var actionButton=document.getElementById("actionBtn");
 
   if(cur<qs.length-1){
-    ab.textContent="次の問題へ →";
-    ab.onclick=next;
+    actionButton.textContent="次の問題へ →";
+    actionButton.onclick=next;
   }else{
-    ab.textContent="結果を見る →";
-    ab.onclick=showResult;
+    actionButton.textContent="結果を見る →";
+    actionButton.onclick=showResult;
   }
 }
 
-function findDuplicateGroups(vals){
-  var positions={};
+function warn(message){
+  var feedback=document.getElementById("feedback");
 
-  vals.forEach(function(value,index){
-    if(!positions[value]){
-      positions[value]=[];
-    }
+  feedback.className="fb fb-warn";
+  feedback.style.display="block";
 
-    positions[value].push(index);
-  });
-
-  return Object.keys(positions)
-    .filter(function(key){
-      return positions[key].length>1;
-    })
-    .map(function(key){
-      return {
-        value:key,
-        indexes:positions[key]
-      };
-    });
-}
-
-function showDuplicateWarning(groups){
-  var q=qs[cur];
-  var messages=[];
-
-  groups.forEach(function(group){
-    group.indexes.forEach(function(index){
-      var select=document.getElementById("sel"+index);
-
-      if(select){
-        select.classList.add("duplicate");
-      }
-    });
-
-    var event=q.events.find(function(item){
-      return item.key===group.value;
-    });
-
-    var positionText=group.indexes
-      .map(function(index){
-        return (index+1)+"番目";
-      })
-      .join("と");
-
-    messages.push(
-      positionText+
-      "で「"+
-      event.text+
-      "」が重複しています。"
-    );
-  });
-
-  warn(
-    "同じ出来事が重複しています。<br>"+
-    messages.join("<br>")
-  );
-}
-
-function warn(msg){
-  var fb=document.getElementById("feedback");
-
-  fb.className="fb fb-warn";
-  fb.style.display="block";
-
-  fb.innerHTML=
-    '<div class="fb-title">⚠ '+msg+'</div>';
+  feedback.innerHTML=
+    '<div class="fb-title">⚠ '+message+'</div>';
 }
 
 function next(){
@@ -655,28 +658,31 @@ function showResult(){
   document.getElementById("prog").style.width="100%";
   document.getElementById("progLabel").textContent="完了！";
 
-  var msg=
-    score===5
-      ?"完璧！トリアージセンス抜群！"
-      :score>=3
-        ?"良い調子！解説を読み直してみましょう"
-        :"解説を確認して、もう一度チャレンジ！";
+  var messages=[
+    "もう一度キーワードと報告順を確認してみましょう！",
+    "解説を読み直すと、さらに上達しますよ！",
+    "あと少しで完璧！報告の流れを意識してみましょう！",
+    "ほぼ完璧！報告文マスターに近づいています！",
+    "完璧です！報告文マスターですね！"
+  ];
+
+  var message=messages[Math.min(score,4)];
 
   document.getElementById("scenarioCard").innerHTML=
     '<div class="result-wrap">'+
-    '<div class="result-score">'+score+' / '+qs.length+'</div>'+
-    '<div class="result-msg">'+msg+'</div>'+
+      '<div class="result-score">'+score+' / '+qs.length+'</div>'+
+      '<div class="result-msg">'+message+'</div>'+
     '</div>';
 
-  document.getElementById("eventsList").innerHTML="";
-  document.getElementById("answerCard").style.display="none";
+  document.getElementById("keywordCard").style.display="none";
+  document.getElementById("inputArea").style.display="none";
   document.getElementById("feedback").style.display="none";
   document.getElementById("clearBtn").style.display="none";
 
-  var ab=document.getElementById("actionBtn");
-  ab.textContent="もう一度挑戦する →";
+  var actionButton=document.getElementById("actionBtn");
+  actionButton.textContent="もう一度挑戦する →";
 
-  ab.onclick=function(){
+  actionButton.onclick=function(){
     location.reload();
   };
 }
