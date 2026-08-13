@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Andante 中級編｜上部消化管外科レビュー版</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',
+  'Hiragino Sans','Noto Sans JP',sans-serif;
+  background:#f5f5f0;
+  color:#1a1a1a;
+  padding:16px;
+  font-size:15px;
+}
+.wrap{max-width:520px;margin:0 auto}
+.prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.prog-bar{flex:1;height:6px;border-radius:3px;background:#e0e0e0;overflow:hidden}
+.prog-fill{height:100%;background:#f59e0b;border-radius:3px;transition:width .35s}
+.prog-label{font-size:13px;color:#666;white-space:nowrap}
+.card{
+  background:#fff;border-radius:14px;border:1px solid #e5e5e5;
+  padding:16px;margin-bottom:14px
+}
+.badge{
+  display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;
+  border-radius:20px;background:#fef3c7;color:#b45309;margin-bottom:10px
+}
+.stage-title{font-size:20px;font-weight:800;margin-bottom:10px;line-height:1.4}
+.scenario{font-size:13px;line-height:1.8;color:#555}
+.note{
+  background:#fffbeb;border:1px solid #fcd34d;color:#92400e;
+  border-radius:12px;padding:13px 14px;margin-bottom:14px;
+  font-size:13px;line-height:1.7
+}
+.patient-list{display:flex;flex-direction:column;gap:10px}
+.patient-card{
+  background:#fff;border:1.5px solid #d1d5db;border-radius:12px;padding:13px;
+  display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center
+}
+.rank{
+  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:#fef3c7;color:#b45309;
+  font-weight:800;font-size:16px
+}
+.patient-name{font-weight:700;font-size:14px;margin-bottom:5px}
+.patient-info{font-size:13px;color:#555;line-height:1.6}
+.move-buttons{display:flex;flex-direction:column;gap:6px}
+.move-btn{
+  width:38px;min-width:38px;padding:8px 0;border-radius:9px;
+  border:1px solid #d1d5db;background:#fff;font-size:16px;
+  font-weight:700;cursor:pointer
+}
+.move-btn:disabled{opacity:.3;cursor:default}
+.additional-box{
+  background:#f0fdf4;border:1px solid #86efac;
+  border-radius:12px;padding:14px;margin-top:10px
+}
+.additional-item{padding:10px 0;border-bottom:1px dashed #bbf7d0}
+.additional-item:last-child{border-bottom:none}
+.additional-name{font-weight:700;color:#166534;margin-bottom:4px}
+.additional-text{font-size:13px;color:#333;line-height:1.7}
+textarea{
+  width:100%;min-height:150px;resize:vertical;border:1.5px solid #d1d5db;
+  border-radius:12px;padding:12px;font-family:inherit;font-size:14px;line-height:1.7
+}
+textarea:focus{
+  outline:none;border-color:#f59e0b;
+  box-shadow:0 0 0 3px rgba(245,158,11,.12)
+}
+.label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+.small{font-size:12px;color:#777;line-height:1.6;margin-top:7px}
+.btn-row{display:flex;gap:10px;margin-top:4px}
+button.main,button.sub{
+  flex:1;font-size:15px;font-weight:700;padding:13px;
+  border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent
+}
+button.main{background:#f59e0b;color:#fff;border:1.5px solid #f59e0b}
+button.main:active{background:#d97706}
+button.sub{background:#fff;color:#1a1a1a;border:1.5px solid #d1d5db}
+button.sub:active{background:#f0f0f0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.compare-box{border:1px solid #e5e5e5;border-radius:12px;padding:12px;background:#fafafa}
+.compare-title{font-size:12px;color:#777;margin-bottom:7px;font-weight:700}
+.compare-line{font-size:13px;line-height:1.7}
+.feedback-card{
+  border-radius:12px;padding:14px;margin-top:14px;
+  font-size:13px;line-height:1.75
+}
+.feedback-ok{
+  background:#f0fdf4;border:1px solid #86efac;color:#166534
+}
+.feedback-review{
+  background:#eff6ff;border:1px solid #93c5fd;color:#1e3a8a
+}
+.feedback-title{font-weight:800;font-size:14px;margin-bottom:8px}
+.feedback-subtitle{font-weight:700;margin-top:10px;margin-bottom:4px}
+.feedback-text{color:#333}
+.result-wrap{text-align:center;padding:26px 8px}
+.result-icon{font-size:46px;margin-bottom:8px}
+.result-title{font-size:22px;font-weight:800;margin-bottom:10px}
+.result-msg{font-size:14px;color:#555;line-height:1.8}
+@media(max-width:420px){
+  .patient-card{grid-template-columns:38px 1fr auto;padding:11px}
+  .compare{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="prog-wrap">
+    <div class="prog-bar">
+      <div class="prog-fill" id="prog" style="width:0%"></div>
+    </div>
+    <span class="prog-label" id="progLabel">1 / 3</span>
+  </div>
+
+  <div id="mainArea"></div>
+
+  <div class="btn-row">
+    <button class="sub" id="backBtn" onclick="goBack()">戻る</button>
+    <button class="main" id="nextBtn" onclick="handleNext()">次へ →</button>
+  </div>
+</div>
+
+<script>
+var cases=[
+{
+  scene:"上部消化管外科病棟の日勤帯です。胃切除後の3名について同時に報告事項が生じました。現時点の情報だけで、医師へ報告する優先順位を考えてください。",
+  patients:[
+    {id:"A",name:"患者A",initial:"幽門側胃切除後1日目。BP 118/70mmHg、HR 88回/分。腹痛NRS 4。ドレーン排液は淡血性です。",additional:"バイタルに大きな変化はなく、ドレーン排液量・性状も著変ありません。"},
+    {id:"B",name:"患者B",initial:"胃全摘後2日目。BP 105/65mmHg、HR 102回/分。倦怠感があり、ドレーン排液がやや血性です。",additional:"BP 86/52mmHg、HR 122回/分。顔面蒼白となり、ドレーン排液が鮮血様に変化し、直近1時間で約150mL増加しました。"},
+    {id:"C",name:"患者C",initial:"幽門側胃切除後3日目。BP 124/76mmHg、HR 84回/分。38.0℃の発熱と創部痛があります。",additional:"意識清明で循環動態は安定しています。創部の発赤・腫脹は明らかではありません。"}
+  ],
+  acceptableOrders:[["B","C","A"],["B","A","C"]],
+  recommendedLabel:"追加情報後は患者Bを最優先とする判断が妥当です。患者AとCの順番は、施設の術後管理方針や追加所見により入れ替わり得ます。",
+  feedback:"患者Bは低血圧・頻脈・顔面蒼白に加え、ドレーン排液の鮮血化と急増を認めており、術後出血による循環不全を疑う情報が重なっています。最優先で再評価し、速やかな報告・応援要請を検討する場面です。患者AとCは現時点で循環動態が安定しています。※本症例は専門医レビュー前の試作版です。"
+},
+{
+  scene:"上部消化管外科病棟です。食道切除後を含む3名に変化があります。初期情報から報告の優先順位を考えてください。",
+  patients:[
+    {id:"A",name:"患者A",initial:"食道切除後1日目。酸素2L/分でSpO₂ 95％、RR 20回/分。創部痛があります。",additional:"鎮痛後、深呼吸が可能となり、SpO₂ 96％、RR 18回/分です。"},
+    {id:"B",name:"患者B",initial:"食道切除後2日目。酸素2L/分でSpO₂ 93％、RR 24回/分。痰が増えています。",additional:"酸素2L/分投与中にもかかわらずSpO₂ 88％へ低下。RR 32回/分、努力呼吸があり、HR 118回/分です。"},
+    {id:"C",name:"患者C",initial:"胃切除後2日目。38.2℃の発熱、HR 96回/分。創部痛があります。",additional:"BPは保たれ、意識清明です。創部・ドレーンに明らかな急変所見はありません。"}
+  ],
+  acceptableOrders:[["B","C","A"],["B","A","C"]],
+  recommendedLabel:"追加情報後は患者Bを最優先とする判断が妥当です。",
+  feedback:"患者Bは酸素投与下でもSpO₂が低下し、頻呼吸・努力呼吸・頻脈を伴っています。呼吸状態の急速な悪化を示すため、原因検索より先に緊急性を認識し、迅速な観察・報告・必要な初期対応につなげる場面です。患者Aは追加情報で改善傾向、患者Cは発熱がありますが現時点で循環動態は保たれています。※本症例は専門医レビュー前の試作版です。"
+},
+{
+  scene:"胃切除後患者3名の経過を確認しています。どの患者を先に報告するか、まず初期情報だけで判断してください。",
+  patients:[
+    {id:"A",name:"患者A",initial:"胃全摘後4日目。37.6℃、HR 90回/分。軽度腹痛がありますが離床できています。",additional:"38.8℃へ上昇し、HR 122回/分。腹痛が増強し、ドレーン排液が混濁して性状が変化。全身倦怠感も強くなりました。"},
+    {id:"B",name:"患者B",initial:"幽門側胃切除後2日目。38.1℃、HR 98回/分。創部痛があります。",additional:"BPは安定し、解熱傾向です。腹部所見・ドレーン性状に明らかな悪化はありません。"},
+    {id:"C",name:"患者C",initial:"胃全摘後5日目。食欲低下、37.8℃、HR 96回/分。軽い腹部膨満感があります。",additional:"嘔吐はなく、腹痛増強もありません。バイタルは大きく変化していません。"}
+  ],
+  acceptableOrders:[["A","B","C"],["A","C","B"]],
+  recommendedLabel:"追加情報後は患者Aを最優先とする判断が妥当です。患者BとCは追加所見を踏まえて順位を検討します。",
+  feedback:"患者Aでは発熱上昇、頻脈、腹痛増強、ドレーン排液の混濁・性状変化、全身倦怠感という複数の悪化所見が新たにそろっています。術後感染性合併症や吻合部関連合併症などを含めた評価が必要となるため、初期判断を固定せず優先順位を引き上げることが重要です。病名を当てることより、経時変化から緊急度を上げる判断を学習目標としています。※本症例は専門医レビュー前の試作版です。"
+}
+];
+
+var currentCase=0;
+var stage="initial";
+var currentOrder=[];
+var initialOrder=[];
+var revisedOrder=[];
+var rationales=[];
+
+function clonePatients(){
+  return cases[currentCase].patients.map(function(p){
+    return{
+      id:p.id,
+      name:p.name,
+      initial:p.initial,
+      additional:p.additional
+    };
+  });
+}
+
+function shuffle(array){
+  var copied=array.slice();
+  for(var i=copied.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=copied[i];
+    copied[i]=copied[j];
+    copied[j]=tmp;
+  }
+  return copied;
+}
+
+function render(){
+  var area=document.getElementById("mainArea");
+  area.innerHTML="";
+
+  document.getElementById("prog").style.width=
+    Math.round(currentCase/cases.length*100)+"%";
+
+  document.getElementById("progLabel").textContent=
+    (currentCase+1)+" / "+cases.length;
+
+  if(stage==="initial")renderInitial(area);
+  else if(stage==="additional")renderAdditional(area);
+  else if(stage==="reorder")renderReorder(area);
+  else if(stage==="reason")renderReason(area);
+  else if(stage==="review")renderReview(area);
+  else if(stage==="result")renderResult(area);
+
+  updateButtons();
+}
+
+function renderHeader(area,title,description){
+  var card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=
+    '<div class="badge">Andante 中級編｜上部消化管外科レビュー版</div>'+
+    '<div class="stage-title">'+title+'</div>'+
+    '<p class="scenario">'+description+'</p>';
+  area.appendChild(card);
+}
+
+function renderInitial(area){
+  renderHeader(
+    area,
+    "① 初期情報で優先順位を考える",
+    cases[currentCase].scene
+  );
+
+  var note=document.createElement("div");
+  note.className="note";
+  note.innerHTML=
+    "現在わかっている情報だけで考えてください。<br>"+
+    "上にある患者ほど、先に報告する想定です。";
+  area.appendChild(note);
+
+  if(currentOrder.length===0){
+    currentOrder=shuffle(clonePatients());
+  }
+
+  area.appendChild(createPatientList("initial"));
+}
+
+function renderAdditional(area){
+  renderHeader(
+    area,
+    "② カルテから追加情報を確認",
+    "カルテを確認したところ、次の情報が入力されていました。"
+  );
+
+  var box=document.createElement("div");
+  box.className="additional-box";
+
+  cases[currentCase].patients.forEach(function(p){
+    var item=document.createElement("div");
+    item.className="additional-item";
+    item.innerHTML=
+      '<div class="additional-name">'+p.name+'</div>'+
+      '<div class="additional-text">'+p.additional+'</div>';
+    box.appendChild(item);
+  });
+
+  var card=document.createElement("div");
+  card.className="card";
+  card.appendChild(box);
+  area.appendChild(card);
+
+  var note=document.createElement("div");
+  note.className="note";
+  note.innerHTML=
+    "<strong>最初の順番と違っていても問題ありません。</strong><br>"+
+    "臨床現場では、情報収集後に優先順位が変わることがあります。";
+  area.appendChild(note);
+}
+
+function renderReorder(area){
+  renderHeader(
+    area,
+    "③ 追加情報を踏まえて再検討",
+    "もう一度、医師へ報告する優先順位を考えてください。"
+  );
+
+  var note=document.createElement("div");
+  note.className="note";
+  note.innerHTML=
+    "上にある患者ほど、先に報告する想定です。<br>"+
+    "正解を当てるのではなく、判断の変化を確認してください。";
+  area.appendChild(note);
+
+  area.appendChild(createPatientList("additional"));
+}
+
+function renderReason(area){
+  renderHeader(
+    area,
+    "④ 判断した根拠を整理する",
+    "追加情報を踏まえて、この順番にした理由を記載してください。"
+  );
+
+  var card=document.createElement("div");
+  card.className="card";
+
+  var label=document.createElement("label");
+  label.className="label";
+  label.setAttribute("for","reason");
+  label.textContent="判断した根拠";
+
+  var textarea=document.createElement("textarea");
+  textarea.id="reason";
+  textarea.placeholder=
+    "例）\n"+
+    "・患者Aは血圧低下と意識レベル低下があり、循環不全の危険が高いと考えた。\n"+
+    "・患者Bも低酸素状態だが、患者Aを最優先と判断した。";
+  textarea.value=rationales[currentCase]||"";
+
+  textarea.oninput=function(){
+    rationales[currentCase]=this.value;
+  };
+
+  var small=document.createElement("div");
+  small.className="small";
+  small.textContent=
+    "箇条書きでも構いません。特に判断に影響した情報と、その理由を書いてください。";
+
+  card.appendChild(label);
+  card.appendChild(textarea);
+  card.appendChild(small);
+  area.appendChild(card);
+
+  var note=document.createElement("div");
+  note.className="note";
+  note.innerHTML=
+    "この問題は、唯一の正解を求めるものではありません。<br>"+
+    "「なぜそのように考えたか」を言葉にして整理することが目的です。";
+  area.appendChild(note);
+}
+
+function renderReview(area){
+  renderHeader(
+    area,
+    "⑤ 自分の判断を振り返る",
+    "初期判断と、追加情報後の判断を見比べてください。"
+  );
+
+  var card=document.createElement("div");
+  card.className="card";
+
+  var compare=document.createElement("div");
+  compare.className="compare";
+
+  var before=document.createElement("div");
+  before.className="compare-box";
+  before.innerHTML=
+    '<div class="compare-title">初期判断</div>'+
+    initialOrder.map(function(p,i){
+      return'<div class="compare-line">'+(i+1)+'位　'+p.name+'</div>';
+    }).join("");
+
+  var after=document.createElement("div");
+  after.className="compare-box";
+  after.innerHTML=
+    '<div class="compare-title">追加情報後</div>'+
+    revisedOrder.map(function(p,i){
+      return'<div class="compare-line">'+(i+1)+'位　'+p.name+'</div>';
+    }).join("");
+
+  compare.appendChild(before);
+  compare.appendChild(after);
+  card.appendChild(compare);
+
+  var reasonBox=document.createElement("div");
+  reasonBox.style.cssText=
+    "margin-top:14px;padding-top:14px;border-top:1px solid #e5e5e5";
+
+  reasonBox.innerHTML=
+    '<div class="compare-title">判断した根拠</div>'+
+    '<div class="compare-line" style="white-space:pre-wrap">'+
+    escapeHtml(rationales[currentCase]||"")+
+    '</div>';
+
+  card.appendChild(reasonBox);
+
+  var selectedIds=revisedOrder.map(function(p){
+    return p.id;
+  });
+
+  var isAcceptable=cases[currentCase].acceptableOrders.some(function(order){
+    return JSON.stringify(order)===JSON.stringify(selectedIds);
+  });
+
+  var feedbackBox=document.createElement("div");
+  feedbackBox.className=
+    "feedback-card "+(isAcceptable?"feedback-ok":"feedback-review");
+
+  feedbackBox.innerHTML=
+    '<div class="feedback-title">'+
+    (isAcceptable
+      ?"✓ 妥当な優先順位の一例です"
+      :"推奨例と比較して振り返ってみましょう")+
+    '</div>'+
+    '<div class="feedback-subtitle">推奨される考え方</div>'+
+    '<div class="feedback-text">'+cases[currentCase].recommendedLabel+'</div>'+
+    '<div class="feedback-subtitle">臨床的な解説</div>'+
+    '<div class="feedback-text">'+cases[currentCase].feedback+'</div>'+
+    (isAcceptable
+      ?'<div class="feedback-subtitle">振り返り</div><div class="feedback-text">追加情報から、緊急性の高い状態を適切に捉えられています。自分が特に重視した情報と、解説で示された視点を比較してみましょう。</div>'
+      :'<div class="feedback-subtitle">振り返り</div><div class="feedback-text">選んだ順番にも考えた理由があるはずです。推奨例と比べて、生命への危険、状態悪化の速さ、すでに安全が確保されているかという観点で、どの情報を重視したか確認してみましょう。</div>');
+
+  card.appendChild(feedbackBox);
+  area.appendChild(card);
+}
+
+function renderResult(area){
+  document.getElementById("prog").style.width="100%";
+  document.getElementById("progLabel").textContent="完了！";
+
+  var card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=
+    '<div class="result-wrap">'+
+      '<div class="result-icon">🌱</div>'+
+      '<div class="result-title">トレーニング完了</div>'+
+      '<div class="result-msg">'+
+        '情報を集め、判断を見直し、根拠を言葉にする練習ができました。<br>'+
+        'Poco a poco se llega lejos.'+
+      '</div>'+
+    '</div>';
+
+  area.appendChild(card);
+}
+
+function createPatientList(infoType){
+  var list=document.createElement("div");
+  list.className="patient-list";
+
+  currentOrder.forEach(function(p,index){
+    var card=document.createElement("div");
+    card.className="patient-card";
+
+    var rank=document.createElement("div");
+    rank.className="rank";
+    rank.textContent=index+1;
+
+    var body=document.createElement("div");
+    body.innerHTML=
+      '<div class="patient-name">'+p.name+'</div>'+
+      '<div class="patient-info">'+
+      (infoType==="initial"
+        ?p.initial
+        :p.initial+'<br><strong>追加：</strong>'+p.additional)+
+      '</div>';
+
+    var buttons=document.createElement("div");
+    buttons.className="move-buttons";
+
+    var up=document.createElement("button");
+    up.className="move-btn";
+    up.type="button";
+    up.textContent="↑";
+    up.disabled=index===0;
+    up.onclick=function(){
+      moveItem(index,-1);
+    };
+
+    var down=document.createElement("button");
+    down.className="move-btn";
+    down.type="button";
+    down.textContent="↓";
+    down.disabled=index===currentOrder.length-1;
+    down.onclick=function(){
+      moveItem(index,1);
+    };
+
+    buttons.appendChild(up);
+    buttons.appendChild(down);
+
+    card.appendChild(rank);
+    card.appendChild(body);
+    card.appendChild(buttons);
+    list.appendChild(card);
+  });
+
+  return list;
+}
+
+function moveItem(index,direction){
+  var newIndex=index+direction;
+
+  if(newIndex<0||newIndex>=currentOrder.length){
+    return;
+  }
+
+  var temp=currentOrder[index];
+  currentOrder[index]=currentOrder[newIndex];
+  currentOrder[newIndex]=temp;
+
+  render();
+}
+
+function handleNext(){
+  if(stage==="initial"){
+    initialOrder=currentOrder.map(function(p){return p;});
+    stage="additional";
+    render();
+    return;
+  }
+
+  if(stage==="additional"){
+    currentOrder=initialOrder.map(function(p){return p;});
+    stage="reorder";
+    render();
+    return;
+  }
+
+  if(stage==="reorder"){
+    revisedOrder=currentOrder.map(function(p){return p;});
+    stage="reason";
+    render();
+    return;
+  }
+
+  if(stage==="reason"){
+    var reason=(rationales[currentCase]||"").trim();
+
+    if(reason===""){
+      alert("判断した根拠を入力してください。");
+      return;
+    }
+
+    stage="review";
+    render();
+    return;
+  }
+
+  if(stage==="review"){
+    if(currentCase<cases.length-1){
+      currentCase++;
+      stage="initial";
+      currentOrder=[];
+      initialOrder=[];
+      revisedOrder=[];
+      render();
+    }else{
+      stage="result";
+      render();
+    }
+    return;
+  }
+
+  if(stage==="result"){
+    location.reload();
+  }
+}
+
+function goBack(){
+  if(stage==="initial"){
+    return;
+  }
+
+  if(stage==="additional"){
+    currentOrder=initialOrder.map(function(p){return p;});
+    stage="initial";
+  }else if(stage==="reorder"){
+    stage="additional";
+  }else if(stage==="reason"){
+    currentOrder=revisedOrder.map(function(p){return p;});
+    stage="reorder";
+  }else if(stage==="review"){
+    stage="reason";
+  }
+
+  render();
+}
+
+function updateButtons(){
+  var back=document.getElementById("backBtn");
+  var next=document.getElementById("nextBtn");
+
+  back.style.display=
+    (stage==="initial"||stage==="result")?"none":"";
+
+  if(stage==="initial"){
+    next.textContent="この順番で進む →";
+  }else if(stage==="additional"){
+    next.textContent="再度、優先順位を考える →";
+  }else if(stage==="reorder"){
+    next.textContent="根拠を記載する →";
+  }else if(stage==="reason"){
+    next.textContent="判断を振り返る →";
+  }else if(stage==="review"){
+    next.textContent=
+      currentCase<cases.length-1
+        ?"次の問題へ →"
+        :"完了する →";
+  }else if(stage==="result"){
+    next.textContent="もう一度挑戦する →";
+  }
+}
+
+function escapeHtml(text){
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+render();
+</script>
+</body>
+</html>
