@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Andante ペインクリニック特論｜Case 1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif;
+  background:#f6f4f0;color:#24211e;padding:16px;font-size:15px;
+}
+.wrap{max-width:560px;margin:0 auto}
+.prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.prog-bar{flex:1;height:6px;border-radius:4px;background:#e7e1da;overflow:hidden}
+.prog-fill{height:100%;background:#b4a494;border-radius:4px;transition:width .35s}
+.prog-label{font-size:13px;color:#736b63;white-space:nowrap}
+.card{
+  background:#fff;border-radius:14px;border:1px solid #e3ddd6;
+  padding:17px;margin-bottom:14px;box-shadow:0 2px 8px rgba(50,40,30,.03)
+}
+.badge{
+  display:inline-block;font-size:11px;font-weight:700;padding:5px 10px;
+  border-radius:20px;background:#eee8e1;color:#675c52;margin-bottom:10px
+}
+.stage-title{font-size:20px;font-weight:800;margin-bottom:10px;line-height:1.45}
+.scenario{font-size:13px;line-height:1.9;color:#59534d}
+.note{
+  background:#faf8f5;border:1px solid #d9cec3;color:#5e554c;
+  border-radius:12px;padding:13px 14px;margin-bottom:14px;font-size:13px;line-height:1.8
+}
+.info-box{
+  background:#fbfaf8;border:1px solid #ddd6cf;border-radius:12px;
+  padding:14px;margin-bottom:14px
+}
+.info-title{font-size:13px;font-weight:800;color:#665c53;margin-bottom:8px}
+.info-list{padding-left:20px}
+.info-list li{font-size:13px;line-height:1.8;color:#45413d;margin-bottom:4px}
+.voice-box{
+  background:#f7f3ee;border-left:4px solid #b4a494;border-radius:10px;
+  padding:15px 15px;margin:12px 0
+}
+.voice-title{font-size:12px;font-weight:800;color:#796d62;margin-bottom:9px}
+.voice{font-size:14px;line-height:1.9;color:#36312d}
+.voice + .voice{margin-top:12px}
+.label{display:block;font-size:14px;font-weight:800;margin-bottom:8px}
+textarea{
+  width:100%;min-height:165px;resize:vertical;border:1.5px solid #cfc7bf;
+  border-radius:12px;padding:12px;font-family:inherit;font-size:14px;line-height:1.75;
+  background:#fff;color:#24211e
+}
+textarea:focus{outline:none;border-color:#a79686;box-shadow:0 0 0 3px rgba(167,150,134,.12)}
+.small{font-size:12px;color:#7b746d;line-height:1.7;margin-top:8px}
+.btn-row{display:flex;gap:10px;margin-top:4px}
+button.main,button.sub{
+  flex:1;font-size:15px;font-weight:700;padding:13px;border-radius:12px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent
+}
+button.main{background:#8f8073;color:#fff;border:1.5px solid #8f8073}
+button.main:active{background:#75695f}
+button.sub{background:#fff;color:#342f2b;border:1.5px solid #cfc7bf}
+button.sub:active{background:#f2eee9}
+.answer-box{
+  border:1px solid #e1dbd5;border-radius:12px;padding:13px;background:#fcfbfa;margin-top:10px
+}
+.answer-title{font-size:12px;color:#746c65;font-weight:800;margin-bottom:7px}
+.answer-text{font-size:13px;line-height:1.8;white-space:pre-wrap;color:#37322e}
+.point{
+  display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed #ded7d0
+}
+.point:last-child{border-bottom:none}
+.point-num{
+  width:27px;height:27px;min-width:27px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;background:#eee8e1;color:#665c53;
+  font-size:12px;font-weight:800
+}
+.point-text{font-size:13px;line-height:1.75;color:#47413c}
+.result-wrap{text-align:center;padding:22px 8px 10px}
+.result-icon{font-size:42px;margin-bottom:8px}
+.result-title{font-size:22px;font-weight:800;margin-bottom:10px}
+.result-msg{font-size:14px;color:#5d5650;line-height:1.9}
+.disclaimer{
+  margin-top:14px;font-size:11px;color:#857d76;line-height:1.7;
+  border-top:1px solid #ebe6e1;padding-top:11px
+}
+@media(max-width:420px){
+  body{padding:12px}
+  .card{padding:15px}
+  .stage-title{font-size:18px}
+  textarea{min-height:180px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="prog-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="prog" style="width:25%"></div></div>
+    <span class="prog-label" id="progLabel">1 / 4</span>
+  </div>
+
+  <div id="mainArea"></div>
+
+  <div class="btn-row">
+    <button class="sub" id="backBtn" onclick="goBack()">戻る</button>
+    <button class="main" id="nextBtn" onclick="handleNext()">次へ →</button>
+  </div>
+</div>
+
+<script>
+var stage = 1;
+var answers = {
+  q1:"",
+  q2:"",
+  q3:""
+};
+
+function escapeHtml(text){
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function header(title, description){
+  return `
+    <div class="card">
+      <div class="badge">Andante｜ペインクリニック特論｜専門医レビュー用</div>
+      <div class="stage-title">${title}</div>
+      <p class="scenario">${description}</p>
+    </div>`;
+}
+
+function answerCard(id, label, placeholder, value){
+  return `
+    <div class="card">
+      <label class="label" for="${id}">${label}</label>
+      <textarea id="${id}" placeholder="${placeholder}">${escapeHtml(value)}</textarea>
+      <div class="small">正解を当てる問題ではありません。臨床で実際にどう考えるかを自由に記述してください。</div>
+    </div>`;
+}
+
+function renderStage1(){
+  return header(
+    "① 初期情報｜あなたなら、どう声をかけますか？",
+    "慢性疼痛でペインクリニックに通院中の患者です。現在見えている情報だけで、患者への関わりを考えてください。"
+  ) + `
+    <div class="info-box">
+      <div class="info-title">患者について現在わかっていること</div>
+      <ul class="info-list">
+        <li>疼痛のため、本人が希望していた以前の業務には復職できていない。</li>
+        <li>一方で、新しい仕事には就いている。</li>
+        <li>以前より外出や社会活動が可能な場面は増えている。</li>
+        <li>診察では、新しい仕事を続けていることや活動範囲について話している。</li>
+      </ul>
+    </div>
+    <div class="note">
+      医療者から見ると、治療開始時と比較して「できるようになったこと」もある患者です。<br>
+      <strong>この時点では、まだ患者の背景すべてが見えているわけではありません。</strong>
+    </div>
+  ` + answerCard(
+    "q1",
+    "Question 1｜主治医として、どのような言葉をかけますか？",
+    "例）患者の話をどう受け止め、何を確認し、どのように返すかを記述してください。",
+    answers.q1
+  );
+}
+
+function renderStage2(){
+  return header(
+    "② 追加情報｜患者の背景を知ったあと",
+    "その後の診療経過から、患者が置かれている状況について、さらに情報が得られました。"
+  ) + `
+    <div class="info-box">
+      <div class="info-title">追加してわかった背景</div>
+      <ul class="info-list">
+        <li>疼痛のため、本人が最も希望していた元の業務への復職を断念している。</li>
+        <li>疼痛について、家族から十分な理解を得られていないと感じている。</li>
+        <li>親しい身内との死別を経験している。</li>
+        <li>新しく始めた仕事でも、本人に責任のないトラブルに遭っている。</li>
+        <li>「仕事ができていること」と「本人が望んでいた生活に戻れていること」は、本人にとって同じ意味ではない。</li>
+      </ul>
+    </div>
+
+    <div class="answer-box">
+      <div class="answer-title">あなたの最初の回答</div>
+      <div class="answer-text">${escapeHtml(answers.q1)}</div>
+    </div>
+
+    <div class="note">
+      <strong>最初の対応を変えなくても構いません。</strong><br>
+      大切なのは、追加情報によって何を重く見るようになったのかを言葉にすることです。
+    </div>
+  ` + answerCard(
+    "q2",
+    "Question 2｜最初の声かけを維持しますか、変更しますか？",
+    "①どのように関わるか\n②維持／変更する理由\nを記述してください。",
+    answers.q2
+  );
+}
+
+function renderStage3(){
+  return header(
+    "③ さらに見えていなかった情報｜患者は声を上げていなかった",
+    "ここから示す内容は、これまでの診察では患者が主治医に伝えていなかった「患者側の受け止め」です。"
+  ) + `
+    <div class="note">
+      <strong>重要：</strong>これは、医療者が当時知っていた情報ではありません。<br>
+      患者は診察中、この気持ちを言葉にできていませんでした。
+    </div>
+
+    <div class="voice-box">
+      <div class="voice-title">患者の心の中で起きていたこと</div>
+      <div class="voice">
+        励ましてもらっていることや、良くなっている部分を見つけようとしてくれていること自体は理解していた。
+      </div>
+      <div class="voice">
+        しかし、「緩和ケアを受けている患者さんや、まだ社会復帰できていない患者さんと比べれば、自分は“できている側”に分類されているのではないか」と感じていた。
+      </div>
+      <div class="voice">
+        また、「もっと大変な状況の人がいるのだから、自分は大丈夫だと思われているような気がする」と受け止めていた。
+      </div>
+      <div class="voice">
+        その結果、「実はまだつらい」「できているように見えていても、自分ではそう感じていない」「今は励まされること自体がしんどい」という気持ちを、かえって診察で言い出しにくくなっていた。
+      </div>
+    </div>
+
+    <div class="note">
+      この症例で問いたいのは、<strong>ポジティブフィードバックの是非そのものではありません。</strong><br>
+      医療者の意図と患者の受け止めにズレがあり、しかも患者がそのズレを表出していない場合に、どう気づくかを考えます。
+    </div>
+  ` + answerCard(
+    "q3",
+    "Question 3｜患者が自らこの気持ちを表出しない場合、どうすれば拾えるでしょうか？",
+    "具体的な問いかけ、診察時の関わり、確認したいことなどを記述してください。",
+    answers.q3
+  );
+}
+
+function renderStage4(){
+  return header(
+    "④ 振り返り｜判断ではなく「関わり方の更新」を見る",
+    "3つの回答を振り返り、追加情報によって自分の関わり方がどう変化したかを確認してください。"
+  ) + `
+    <div class="card">
+      <div class="answer-box">
+        <div class="answer-title">Question 1｜初期情報での声かけ</div>
+        <div class="answer-text">${escapeHtml(answers.q1)}</div>
+      </div>
+      <div class="answer-box">
+        <div class="answer-title">Question 2｜背景を知ったあとの再検討</div>
+        <div class="answer-text">${escapeHtml(answers.q2)}</div>
+      </div>
+      <div class="answer-box">
+        <div class="answer-title">Question 3｜表出されていない苦痛をどう拾うか</div>
+        <div class="answer-text">${escapeHtml(answers.q3)}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-title" style="font-size:17px">この症例で考えたい5つの視点</div>
+
+      <div class="point">
+        <div class="point-num">1</div>
+        <div class="point-text"><strong>「社会参加している」ことと、本人が「回復した」と感じていることを同一視していないか。</strong></div>
+      </div>
+      <div class="point">
+        <div class="point-num">2</div>
+        <div class="point-text">疼痛だけでなく、仕事、家族関係、喪失体験、新しい環境での負担まで含めて患者像を捉えているか。</div>
+      </div>
+      <div class="point">
+        <div class="point-num">3</div>
+        <div class="point-text">励ましやポジティブな評価が、今この患者にとってどのように受け取られているかを確認しているか。</div>
+      </div>
+      <div class="point">
+        <div class="point-num">4</div>
+        <div class="point-text">患者が「医療者の期待に反すること」やネガティブな感情を言いやすい問いかけ・関係を作れているか。</div>
+      </div>
+      <div class="point">
+        <div class="point-num">5</div>
+        <div class="point-text"><strong>追加情報を、新しい臨床情報として受け取り、最初の関わり方を必要に応じて更新できるか。</strong></div>
+      </div>
+
+      <div class="disclaimer">
+        本症例は専門医レビュー前の教育用プロトタイプです。唯一の模範解答を設定することを目的としていません。
+        症例設定・問い・振り返り項目は、専門医レビューを踏まえて修正することを想定しています。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="result-wrap">
+        <div class="result-icon">🩺</div>
+        <div class="result-title">Case 1 完了</div>
+        <div class="result-msg">
+          「何を言うのが正解か」ではなく、<br>
+          <strong>患者について知る情報が増えたとき、関わり方をどう更新するか。</strong><br>
+          その思考過程を振り返るケースです。
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function saveCurrent(){
+  if(stage===1){
+    var el=document.getElementById("q1"); if(el) answers.q1=el.value;
+  }else if(stage===2){
+    var el=document.getElementById("q2"); if(el) answers.q2=el.value;
+  }else if(stage===3){
+    var el=document.getElementById("q3"); if(el) answers.q3=el.value;
+  }
+}
+
+function render(){
+  var area=document.getElementById("mainArea");
+  if(stage===1) area.innerHTML=renderStage1();
+  else if(stage===2) area.innerHTML=renderStage2();
+  else if(stage===3) area.innerHTML=renderStage3();
+  else area.innerHTML=renderStage4();
+
+  document.getElementById("prog").style.width=(stage*25)+"%";
+  document.getElementById("progLabel").textContent=stage+" / 4";
+
+  var back=document.getElementById("backBtn");
+  var next=document.getElementById("nextBtn");
+  back.style.display=stage===1?"none":"";
+
+  if(stage===1) next.textContent="追加情報を見る →";
+  else if(stage===2) next.textContent="患者側の受け止めを見る →";
+  else if(stage===3) next.textContent="振り返る →";
+  else next.textContent="もう一度取り組む ↻";
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function handleNext(){
+  saveCurrent();
+
+  if(stage===1 && answers.q1.trim()===""){
+    alert("まず、初期情報での声かけを記述してください。");
+    return;
+  }
+  if(stage===2 && answers.q2.trim()===""){
+    alert("追加情報を踏まえた考えを記述してください。");
+    return;
+  }
+  if(stage===3 && answers.q3.trim()===""){
+    alert("患者の声を拾うための関わりを記述してください。");
+    return;
+  }
+
+  if(stage<4){
+    stage++;
+    render();
+  }else{
+    stage=1;
+    answers={q1:"",q2:"",q3:""};
+    render();
+  }
+}
+
+function goBack(){
+  saveCurrent();
+  if(stage>1){
+    stage--;
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
