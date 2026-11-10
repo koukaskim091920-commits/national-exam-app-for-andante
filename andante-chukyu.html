@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>andante 中級編｜判断を振り返る（研究・設計検討用プロトタイプ）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<style>
+:root{
+  --bg:#f2f8fb; --surface:#ffffff; --ink:#1d3243; --muted:#58707f; --line:#d3e3ec;
+  --blue:#276f9e; --on-blue:#ffffff; --blue-soft:#e3f1f9; --green:#1f7a5d; --green-soft:#e2f4ec;
+  --note:#fff5e1; --note-ink:#69490f; --pa:#2b6fa0; --pb:#247a5c; --pc:#7550a0; --on-p:#ffffff;
+  color-scheme:light; box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b24; --surface:#17262f; --ink:#e6eff5; --muted:#a3b6c4; --line:#2b4050;
+    --blue:#7cc0e8; --on-blue:#0b1a24; --blue-soft:#1b3547; --green:#74d3b2; --green-soft:#173a30;
+    --note:#3a2f15; --note-ink:#f1d9a0; --pa:#7cc0e8; --pb:#74d3b2; --pc:#c3a6e8; --on-p:#0b1a24; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b24; --surface:#17262f; --ink:#e6eff5; --muted:#a3b6c4; --line:#2b4050;
+  --blue:#7cc0e8; --on-blue:#0b1a24; --blue-soft:#1b3547; --green:#74d3b2; --green-soft:#173a30;
+  --note:#3a2f15; --note-ink:#f1d9a0; --pa:#7cc0e8; --pb:#74d3b2; --pc:#c3a6e8; --on-p:#0b1a24; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;font-size:17px;line-height:1.8;margin:0}
+#root .muted{color:var(--muted)}
+#root .card{background:var(--surface);border:1.5px solid var(--line);border-radius:18px}
+#root .pA{--pcol:var(--pa)} #root .pB{--pcol:var(--pb)} #root .pC{--pcol:var(--pc)}
+#root .pcard{border-left:7px solid var(--pcol)}
+#root .chip{flex:none;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;font-weight:700;font-size:18px;background:var(--pcol);color:var(--on-p)}
+#root .rank{flex:none;min-width:2.4em;font-weight:700;color:var(--muted);font-size:15px}
+#root .arrow{width:48px;height:44px;border-radius:12px;border:1.5px solid var(--blue);background:var(--surface);color:var(--blue);font-size:16px;cursor:pointer}
+#root .arrow:disabled{opacity:.3;cursor:not-allowed}
+#root .slot{width:100%;min-height:52px;padding:6px 14px;border-radius:14px;border:2px dashed var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:16px;text-align:left;cursor:pointer}
+#root .slot[aria-pressed="true"]{border:3px solid var(--blue);border-style:solid;background:var(--blue-soft);color:var(--ink);font-weight:700}
+#root .btn{width:100%;min-height:58px;border-radius:999px;font-family:inherit;font-weight:700;font-size:19px;cursor:pointer}
+#root .btn-primary{background:var(--blue);color:var(--on-blue);border:2px solid var(--blue)}
+#root .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+#root .btn-ghost{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+#root .tag{display:inline-block;font-size:14px;font-weight:700;line-height:1.6;padding:2px 12px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
+#root .tag.green{background:var(--green-soft);color:var(--green)}
+#root .note{background:var(--note);color:var(--note-ink);border-radius:16px}
+#root .mrow{display:flex;align-items:center;gap:8px;padding:4px 0}
+#root .mline{display:flex;align-items:center;gap:8px;color:var(--blue);font-size:13px;font-weight:700}
+#root .mline::before,#root .mline::after{content:"";flex:1;border-top:3px solid var(--blue)}
+#root .mrow .chip{width:30px;height:30px;font-size:14px}
+#root .bar{flex:1;height:8px;border-radius:99px;background:var(--line)}
+#root .bar.on{background:var(--blue)}
+#root button:focus-visible,#root h2:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const { useState, useRef, useEffect } = React;
+const h = React.createElement;
+
+/* ============ 症例データ（画面ロジックとは分けてあります） ============ */
+const CASE = {
+  situation: "あなたは一般病棟で実習中の看護学生です。指導看護師とともに患者さんを受け持っています。次の3つの状況が同時に起こりました。",
+  unknown: "現在の情報だけでは、患者さんの詳しい状態や緊急性がすべて分かっているわけではありません。",
+  patients: {
+    A: { label: "患者A", text: "「トイレに行きたい」とナースコールがありました。" },
+    B: { label: "患者B", text: "点滴中の患者さんから「点滴が終わりそう」と声をかけられました。" },
+    C: { label: "患者C", text: "別の患者さんから「少し息苦しい」と訴えがありました。" }
+  },
+  defaultOrder: ["A", "B", "C"],
+  boundaryLabels: ["1位の前", "1位と2位の間", "2位と3位の間", "3位の後"],
+  newInfo: {
+    lead: "患者Cの息苦しさについて、指導看護師がすでに状態確認を開始しました。さらに、別の看護師が応援に来て、患者Cの対応を引き継げる状況になりました。",
+    statuses: { A: "対応待ち", B: "対応待ち", C: "指導看護師が対応中。応援看護師への引き継ぎが可能" }
+  },
+  viewpoints: [
+    { title: "症例の安全条件との整合", body: "初期情報では、患者さんの詳しい状態や緊急性は分かっていませんでした。あなたの順位と境界は、どんな安全条件を想定して決めましたか？" },
+    { title: "安全上重要な患者間の順位関係", body: "境界の上と下で、患者さん同士の順位をどう考えましたか？ 順位が入れ替わった理由、または維持した理由を言葉にしてみましょう。" },
+    { title: "追加情報を踏まえた判断の維持・変更", body: "新しく分かったのは、対応できる人手の変化でした。その情報をどう受け止めて、判断を維持または変更しましたか？" }
+  ],
+  pending: "評価基準は今後の専門家レビューで確定",
+  motto: "変えることも、変えないことも、一つの判断結果。",
+  subMotto: "状況を捉え、考え、判断する。その過程を疑似体験する。",
+  disclaimer: "研究・設計検討用のプロトタイプです。実際の医療現場での対応を指示するものではありません。入力内容は保存・送信されません。"
+};
+const STEPS = ["初期判断", "安全境界", "追加情報", "再判断", "振り返り"];
+const TITLES = ["あなたなら、どう動く？", "安全の境界を決める", "新しい情報が入りました", "あなたの判断は、今も変わりませんか？", "あなたの判断を振り返ろう"];
+const EMPTY = { initialOrder: null, initialBoundary: null, updatedOrder: null, updatedBoundary: null, orderChanged: null, boundaryChanged: null };
+
+/* ============ 画面ロジック ============ */
+const moveItem = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return arr; const a = [...arr]; [a[i], a[j]] = [a[j], a[i]]; return a; };
+const sameOrder = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+const boundaryText = b => CASE.boundaryLabels[b] + "（境界の上：" + b + "人）";
+
+const Chip = ({ id }) => h("span", { className: "chip p" + id, "aria-hidden": "true" }, id);
+
+function PatientCard({ id, rank, first, last, onUp, onDown }) {
+  const p = CASE.patients[id];
+  return h("div", { className: "card pcard p" + id + " flex items-center gap-3 p-3" },
+    h("span", { className: "rank" }, rank + "位"),
+    h(Chip, { id }),
+    h("div", { className: "flex-1" },
+      h("p", { className: "text-[16px] font-bold leading-snug" }, p.label),
+      h("p", { className: "text-[16px] leading-snug" }, p.text)),
+    onUp ? h("div", { className: "flex flex-col gap-2" },
+      h("button", { type: "button", className: "arrow", "aria-label": p.label + "を上へ", disabled: first, onClick: onUp }, "▲"),
+      h("button", { type: "button", className: "arrow", "aria-label": p.label + "を下へ", disabled: last, onClick: onDown }, "▼")) : null
+  );
+}
+
+function Slot({ index, selected, onPick }) {
+  const t = CASE.boundaryLabels[index];
+  return h("button", { type: "button", className: "slot", "aria-pressed": selected, onClick: onPick },
+    selected ? "● 境界：" + t + "（上に" + index + "人）" : "○ 境界候補：" + t);
+}
+
+function PatientList({ order, onMove, boundary, onBoundary }) {
+  const items = [];
+  const slot = i => h(Slot, { key: "s" + i, index: i, selected: boundary === i, onPick: () => onBoundary(i) });
+  order.forEach((id, i) => {
+    if (onBoundary) items.push(slot(i));
+    items.push(h(PatientCard, { key: id, id, rank: i + 1, first: i === 0, last: i === order.length - 1,
+      onUp: onMove ? () => onMove(i, -1) : null, onDown: onMove ? () => onMove(i, 1) : null }));
+  });
+  if (onBoundary) items.push(slot(order.length));
+  return h("div", { className: "space-y-2" }, items);
+}
+
+function MiniList({ order, boundary }) {
+  const rows = [];
+  const line = k => h("div", { key: k, className: "mline" }, "境界");
+  order.forEach((id, i) => {
+    if (i === boundary) rows.push(line("line"));
+    rows.push(h("div", { key: id, className: "mrow" },
+      h("span", { className: "muted text-[14px]", style: { minWidth: "2.2em" } }, (i + 1) + "位"),
+      h(Chip, { id }), h("span", null, CASE.patients[id].label)));
+  });
+  if (boundary === order.length) rows.push(line("line"));
+  return h("div", null, rows);
+}
+
+function Compare({ title, order, boundary }) {
+  return h("div", { className: "card p-4" },
+    h("p", { className: "mb-2 font-bold" }, title), h(MiniList, { order, boundary }),
+    h("p", { className: "muted mt-2 text-[15px]" }, "安全境界：" + boundaryText(boundary)));
+}
+
+function Progress({ step }) {
+  return h("nav", { "aria-label": "進行状況", className: "mb-5" },
+    h("p", { className: "muted mb-2 text-[15px]" }, "ステップ " + step + " / 5　" + STEPS[step - 1]),
+    h("div", { className: "flex gap-2" }, STEPS.map((s, i) => h("span", { key: s, className: "bar" + (i < step ? " on" : "") }))));
+}
+
+function App() {
+  const [screen, setScreen] = useState(1);
+  const [order, setOrder] = useState(CASE.defaultOrder);
+  const [draftB, setDraftB] = useState(null);
+  const [workOrder, setWorkOrder] = useState(CASE.defaultOrder);
+  const [workB, setWorkB] = useState(null);
+  const [rec, setRec] = useState(EMPTY);
+  const headRef = useRef(null);
+  useEffect(() => { window.scrollTo(0, 0); if (headRef.current) headRef.current.focus(); }, [screen]);
+
+  const confirmOrder = () => { setRec({ ...EMPTY, initialOrder: [...order] }); setScreen(2); };
+  const confirmBoundary = () => {
+    if (draftB === null) return;
+    setRec({ ...rec, initialBoundary: draftB });
+    setWorkOrder([...rec.initialOrder]); setWorkB(draftB); setScreen(3);
+  };
+  const confirmFinal = () => {
+    setRec({ ...rec, updatedOrder: [...workOrder], updatedBoundary: workB,
+      orderChanged: !sameOrder(workOrder, rec.initialOrder), boundaryChanged: workB !== rec.initialBoundary });
+    setScreen(5);
+  };
+  const reset = () => {
+    setScreen(1); setRec(EMPTY); setOrder(CASE.defaultOrder); setDraftB(null); setWorkOrder(CASE.defaultOrder); setWorkB(null);
+  };
+
+  let body;
+  if (screen === 1) body = [
+    h("p", { key: "a", className: "card p-5 text-[18px]" }, CASE.situation),
+    h("p", { key: "b", className: "muted text-[15px]" }, CASE.unknown),
+    h("p", { key: "c", className: "text-[16px]" }, "対応したい順に、▲▼で並べ替えてください。正解・不正解は表示されません。"),
+    h(PatientList, { key: "d", order, onMove: (i, d) => setOrder(moveItem(order, i, d)) }),
+    h("button", { key: "e", type: "button", className: "btn btn-primary", onClick: confirmOrder }, "順位を確定する")
+  ];
+  if (screen === 2) body = [
+    h("p", { key: "a", className: "text-[16px]" }, "「ここまでは先に対応したい（安全上重要）」と考える位置を、タップで選びます。ここで選ぶ境界はあなたの安全認識を示す入力で、正誤の判定は行いません。"),
+    h(PatientList, { key: "b", order: rec.initialOrder, boundary: draftB, onBoundary: setDraftB }),
+    h("p", { key: "c", className: "muted text-[15px]" }, draftB === null ? "境界の位置を1つ選ぶと、次へ進めます。" : "選択中：" + boundaryText(draftB)),
+    h("button", { key: "d", type: "button", className: "btn btn-primary", disabled: draftB === null, onClick: confirmBoundary }, "この境界で次へ")
+  ];
+  if (screen === 3) body = [
+    h("p", { key: "a", className: "card p-5 text-[18px]" }, CASE.newInfo.lead),
+    h("div", { key: "b", className: "space-y-2" }, ["A", "B", "C"].map(id =>
+      h("div", { key: id, className: "card pcard p" + id + " flex items-center gap-3 p-3" },
+        h(Chip, { id }),
+        h("div", null, h("p", { className: "font-bold" }, "現在の状況：" + CASE.patients[id].label), h("p", null, CASE.newInfo.statuses[id]))))),
+    h("button", { key: "c", type: "button", className: "btn btn-primary", onClick: () => setScreen(4) }, "もう一度判断する")
+  ];
+  if (screen === 4) body = [
+    h("div", { key: "a", className: "card p-4" },
+      h("p", { className: "mb-2 font-bold" }, "初回の判断（参照用）"),
+      h(MiniList, { order: rec.initialOrder, boundary: rec.initialBoundary }),
+      h("p", { className: "muted mt-2 text-[15px]" }, "安全境界：" + boundaryText(rec.initialBoundary))),
+    h("p", { key: "b", className: "text-[16px]" }, "順位は▲▼、境界は候補のタップで選べます。順位も境界も、変えても、そのままでも、この画面から確定できます。"),
+    h(PatientList, { key: "c", order: workOrder, onMove: (i, d) => setWorkOrder(moveItem(workOrder, i, d)), boundary: workB, onBoundary: setWorkB }),
+    h("button", { key: "d", type: "button", className: "btn btn-primary", onClick: confirmFinal }, "判断を確定する")
+  ];
+  if (screen === 5) body = [
+    h("div", { key: "a", className: "grid gap-3 sm:grid-cols-2" },
+      h(Compare, { title: "初回の判断", order: rec.initialOrder, boundary: rec.initialBoundary }),
+      h(Compare, { title: "再判断後の判断", order: rec.updatedOrder, boundary: rec.updatedBoundary })),
+    h("div", { key: "b", className: "card space-y-1 p-4" },
+      h("p", null, "順位を変更したか：", h("b", null, rec.orderChanged ? "変更した" : "変更なし")),
+      h("p", null, "境界を変更したか：", h("b", null, rec.boundaryChanged ? "変更した" : "変更なし"))),
+    h("p", { key: "c", className: "note p-4 text-[16px]" }, CASE.pending + "。以下は自動採点ではなく、振り返りのための説明欄です。"),
+    h("div", { key: "d", className: "space-y-3" }, CASE.viewpoints.map(v =>
+      h("div", { key: v.title, className: "card p-4" }, h("p", { className: "mb-1 font-bold" }, v.title), h("p", { className: "text-[16px]" }, v.body)))),
+    h("div", { key: "e", className: "py-4 text-center" },
+      h("p", { className: "text-[22px] font-bold leading-snug", style: { color: "var(--blue)" } }, CASE.motto),
+      h("p", { className: "muted mt-2 text-[16px]" }, CASE.subMotto)),
+    h("button", { key: "f", type: "button", className: "btn btn-ghost", onClick: reset }, "もう一度学習する")
+  ];
+
+  return h("main", { className: "mx-auto w-full max-w-[680px] px-4 pb-10 pt-6" },
+    h("header", { className: "mb-4" },
+      h("p", { className: "text-[30px] font-bold tracking-wide", style: { color: "var(--blue)" } }, "andante　中級編"),
+      h("p", { className: "muted text-[16px]" }, "自分のペースで、考える力を。")),
+    h(Progress, { step: screen }),
+    h("h2", { ref: headRef, tabIndex: -1, className: "mb-4 text-[23px] font-bold leading-snug" }, TITLES[screen - 1]),
+    h("div", { className: "space-y-4" }, body),
+    h("p", { className: "muted mt-8 text-[13px] leading-relaxed" }, CASE.disclaimer)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
